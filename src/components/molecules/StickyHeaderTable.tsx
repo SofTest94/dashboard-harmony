@@ -144,7 +144,8 @@ const StickyHeaderTable: React.FC<StickyHeaderTableProps> = ({ headers, rows, on
               ? filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               : filteredRows
             ).map((row, rowIndex) => (
-              <TableRow key={rowIndex} className="hover-hand" onClick={() => onRowClick(row)}>
+              // <TableRow key={rowIndex} className="hover-hand" onClick={() => onRowClick(row)}>
+              <TableRow key={rowIndex} className="hover-hand">
                 {row.slice(5).map((cell, cellIndex) => (
                   <TableCell key={cellIndex}>
                     {typeof cell === 'string' && cell.match(/\.(jpeg|jpg|gif|png)$/) ? (
@@ -155,7 +156,7 @@ const StickyHeaderTable: React.FC<StickyHeaderTableProps> = ({ headers, rows, on
                   </TableCell>
                 ))}
                 <TableCell>
-                  <Button onClick={() => handleEditRow(rowIndex, row as any)} color="primary">
+                  <Button onClick={() => onRowClick(row)} color="primary">
                     Editar
                   </Button>
                   <Button onClick={() => handleDeleteRow(rowIndex, row[0] as string, row[1] as string)} color="error">
