@@ -34,9 +34,11 @@ import HomePage from './components/pages/HomePage';
 import LoginPage from './components/organisms/LoginPage';
 import FluidTemplate from './components/templates/FluidTemplate';
 import AdminTemplate from './components/templates/AdminTemplate';
-import EmployeePage from './components/pages/EmployeePage';
-import AppointmentPage from './components/pages/AppointmentPage';
+import EmployeePage from './components/pages/Employees/EmployeePage';
+import AppointmentPage from './components/pages/Appointments/AppointmentPage';
 import { red } from '@mui/material/colors';
+import AddEmployeePage from './components/pages/Employees/AddEmployeePage';
+import EditEmployeePage from './components/pages/Employees/EditEmployeePage';
 // import AppTemplate from './components/templates/AppTemplate'; // Importa la plantilla principal
 
 const App: React.FC = () => {
@@ -62,7 +64,7 @@ const App: React.FC = () => {
           element={
             // Utiliza la plantilla principal para el contenido principal
             <AdminTemplate>
-              <div style={{ margin: '0% 5% 10% 5%' }}>
+              <div style={{ margin: '1% 5% 0% 5%' }}>
                 <EmployeePage />
               </div>
             </AdminTemplate>
