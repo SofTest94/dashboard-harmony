@@ -89,12 +89,12 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
           <ListItem
             button
             component={RouterLink}
-            to="/employees"
+            to="/user"
             selected={selectedIndex === 1}
             onClick={() => handleMenuItemClick(1)}
           >
             <GroupIcon sx={{ mr: 1 }} color={selectedIndex === 1 ? 'primary' : 'inherit'} />
-            <ListItemText primary="Empleados" />
+            <ListItemText primary="Usuarios" />
           </ListItem>
           <Divider />
           <ListItem
@@ -113,7 +113,7 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
       {/* Contenido principal */}
       <div style={{ marginLeft: open ? 240 : 0, width: '100%', transition: 'margin-left 0.3s ease' }}>
         {/* AppBar */}
-        <AppBar position="static" sx={{ bgcolor: '#00D6B2' }}>
+        <AppBar position="static" sx={{ backgroundColor: '#00D6B2' }}>
           <Toolbar>
             {/* Menú desplegable */}
             <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerOpen}>

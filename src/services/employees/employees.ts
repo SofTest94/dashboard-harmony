@@ -1,4 +1,4 @@
-import MediclarApi from '../config';
+import HarmonyApi from '../config';
 // import {
 //   createBranchType,
 //   getAllBranchesItemsType,
@@ -14,7 +14,7 @@ async function getAllEmployees(idCompany: string, token: string, page: number, p
       perPage: perPage,
     };
 
-    const response = await MediclarApi.get<any>('employees', {
+    const response = await HarmonyApi.get<any>('employees', {
       params,
       headers: { Authorization: 'Bearer ' + token },
     });
@@ -43,7 +43,7 @@ async function getAllEmployees(idCompany: string, token: string, page: number, p
 */
 async function createEmployee(data: any, token: string): Promise<any> {
   try {
-    const response = await MediclarApi.post<any>('employees/', data, {
+    const response = await HarmonyApi.post<any>('employees/', data, {
       headers: { Authorization: 'Bearer ' + token },
     });
 

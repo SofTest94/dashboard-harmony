@@ -32,13 +32,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // import LoginPage from './components/pages/LoginPage';
 import HomePage from './components/pages/HomePage';
 import LoginPage from './components/organisms/LoginPage';
-import FluidTemplate from './components/templates/FluidTemplate';
 import AdminTemplate from './components/templates/AdminTemplate';
 import EmployeePage from './components/pages/Employees/EmployeePage';
 import AppointmentPage from './components/pages/Appointments/AppointmentPage';
-import { red } from '@mui/material/colors';
-import AddEmployeePage from './components/pages/Employees/AddEmployeePage';
-import EditEmployeePage from './components/pages/Employees/EditEmployeePage';
+
+import UserList from './components/pages/Users/UserListPage';
 // import AppTemplate from './components/templates/AppTemplate'; // Importa la plantilla principal
 
 const App: React.FC = () => {
@@ -48,6 +46,17 @@ const App: React.FC = () => {
         {/* Ruta para el login */}
         <Route path="/" element={<LoginPage />} />
         {/* Ruta para el contenido principal */}
+        <Route
+          path="/user"
+          element={
+            // Utiliza la plantilla principal para el contenido principal
+            <AdminTemplate>
+              <div style={{ margin: '0% 5% 10% 5%' }}>
+                <UserList />
+              </div>
+            </AdminTemplate>
+          }
+        />
         <Route
           path="/home"
           element={
@@ -59,17 +68,7 @@ const App: React.FC = () => {
             </AdminTemplate>
           }
         />
-        <Route
-          path="/employees"
-          element={
-            // Utiliza la plantilla principal para el contenido principal
-            <AdminTemplate>
-              <div style={{ margin: '1% 5% 0% 5%' }}>
-                <EmployeePage />
-              </div>
-            </AdminTemplate>
-          }
-        />
+
         <Route
           path="/appointments"
           element={
