@@ -22,6 +22,7 @@ import {
   Typography,
   Container,
   FormHelperText,
+  Tooltip,
 } from '@mui/material';
 
 import { userServices } from '../../../services/users/users';
@@ -56,6 +57,7 @@ const UserList = () => {
   const [updatedAt, setUpdatedAt] = useState<string>('');
   const [v, setV] = useState<number>(0);
   const [specialty, setSpecialty] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -109,18 +111,18 @@ const UserList = () => {
   };
 
   const handleAddUser = async () => {
+    const newUser: CreateUsers = {
+      firstName,
+      lastName,
+      middleName,
+      fullName: `${firstName} ${lastName} ${middleName}`,
+      idSpecialty: selectedSpecialty,
+      photo: '', // Omitimos la foto aquí ya que la enviaremos por separado
+      specialty,
+    };
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     if (fileInput && fileInput.files && fileInput.files[0]) {
       const file = fileInput.files[0];
-      const newUser: CreateUsers = {
-        firstName,
-        lastName,
-        middleName,
-        fullName: `${firstName} ${lastName} ${middleName}`,
-        idSpecialty: selectedSpecialty,
-        photo: '', // Omitimos la foto aquí ya que la enviaremos por separado
-        specialty,
-      };
 
       try {
         // Subir la foto al servicio S3
@@ -128,30 +130,29 @@ const UserList = () => {
 
         // Agregar la URL de la foto al nuevo usuario
         newUser.photo = decodeURIComponent(photoUrl.fileUrl);
-
-        // Crear el usuario con la foto y los demás datos
-        await userServices.createUser(newUser, '');
-
-        // Actualizar el estado de los usuarios
-        let updatedUsers = [...users, newUser];
-
-        setUsers(updatedUsers);
-
-        // Limpiar los campos
-        clearInputFields();
-
-        // Cerrar el modal
-        closeModal();
-
-        // Mostrar ventana modal de éxito
-        setAction('agregar');
-        setSuccessOpen(true);
       } catch (error) {
         console.error('Error al agregar usuario:', error);
       }
     } else {
-      console.error('No se ha seleccionado ninguna imagen.');
+      newUser.photo = 'https://bucket-harmony.s3.amazonaws.com/defualt2.png';
     }
+    // Crear el usuario con la foto y los demás datos
+    await userServices.createUser(newUser, '');
+
+    // Actualizar el estado de los usuarios
+    let updatedUsers = [...users, newUser];
+
+    setUsers(updatedUsers);
+
+    // Limpiar los campos
+    clearInputFields();
+
+    // Cerrar el modal
+    closeModal();
+
+    // Mostrar ventana modal de éxito
+    setAction('agregar');
+    setSuccessOpen(true);
   };
 
   const handleUpdateUser = async () => {
@@ -260,22 +261,49 @@ const UserList = () => {
     setPage(0);
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const normalizeString = (str: string) => {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  };
+
+  const filteredUsers = users.filter((user) =>
+    normalizeString(user.fullName).toLowerCase().includes(normalizeString(searchTerm).toLowerCase())
+  );
+
   return (
     <Container component="main" maxWidth="md">
-      <Typography variant="h3" align="center">
-        Empleados
+      <br />
+      <br />
+      <Typography variant="h3" align="justify">
+        LISTADO DE EMPLEADOS
       </Typography>
+
+      <Tooltip title="Buscar por nombre">
+        <TextField
+          label="Buscar"
+          variant="outlined"
+          margin="normal"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          fullWidth
+        />
+      </Tooltip>
+      <br />
+      <br />
       <TableContainer component={Paper}>
         <Table>
-          <TableHead>
+          <TableHead style={{ backgroundColor: '#f0f0f0' }}>
             <TableRow>
-              <TableCell>NOMBRE COMPLETO</TableCell>
-              <TableCell>ESPECIALIDAD</TableCell>
-              <TableCell>FOTO</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>NOMBRE COMPLETO</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>ESPECIALIDAD</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>FOTO</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
+            {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
               <TableRow
                 key={user._id}
                 onClick={() => openModal(user._id, user)}
@@ -294,11 +322,6 @@ const UserList = () => {
         </Table>
       </TableContainer>
 
-      <div>
-        <Button variant="contained" color="primary" onClick={() => openModal(selectedUserId)}>
-          +
-        </Button>
-      </div>
       {/* <Dialog open={modalOpen} onClose={closeModal} disableEscapeKeyDown> */}
       <Dialog
         open={modalOpen}
@@ -309,103 +332,153 @@ const UserList = () => {
         }}
       >
         <DialogTitle>{selectedUser ? 'Actualizar Usuario' : 'Agregar Nuevo Usuario'}</DialogTitle>
-        <DialogContent>
-          <Box mb={2}>
-            <TextField label="Nombre" value={firstName} onChange={(e) => setFirstName(e.target.value)} fullWidth />
+        <DialogContent style={{ maxWidth: '600px', overflow: 'hidden' }}>
+          {/* Fila 1 */}
+          <Box mb={2} display="flex" justifyContent="center">
+            {/* <Typography variant="h6" align="center">
+              {selectedUser ? 'Actualizar' : 'Agregar'}
+            </Typography> */}
           </Box>
-          <Box mb={2}>
-            <TextField label="A. Paterno" value={lastName} onChange={(e) => setLastName(e.target.value)} fullWidth />
-          </Box>
-          <Box mb={2}>
-            <TextField label="A. Materno" value={middleName} onChange={(e) => setMiddleName(e.target.value)} fullWidth />
-          </Box>
-          <Box mb={2}>
-            <FormControl fullWidth>
-              <FormHelperText>Seleccione una especialidad</FormHelperText>
-              <Select
-                value={selectedSpecialty}
-                onChange={(e) => {
-                  const selectedSpecialtyId = e.target.value as string;
-                  const selectedSpecialtyName =
-                    initialSpecialties.find((specialty) => specialty._id === selectedSpecialtyId)?.name || '';
-                  setSelectedSpecialty(selectedSpecialtyId);
-                  setSpecialty(selectedSpecialtyName); // Establecer el nombre de la especialidad en el estado specialty
-                }}
-              >
-                {initialSpecialties.map((specialty) => (
-                  <MenuItem key={specialty._id} value={specialty._id}>
-                    {specialty.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-          <Box mb={2}>
-            <input
-              id="fileInput"
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files && e.target.files[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onloadend = () => {
-                    if (reader.result) {
-                      setPhoto(reader.result.toString());
-                    }
-                  };
-                  reader.readAsDataURL(file);
-                }
-              }}
-            />
-          </Box>
-          <Box mb={2}>{photo && <img src={photo} alt="Preview" style={{ maxWidth: '100%', maxHeight: '200px' }} />}</Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeModal} color="primary">
-            Cancelar
-          </Button>
-          {selectedUser ? (
-            <>
-              <Button
-                onClick={() => {
-                  setConfirmOpen(true);
-                  setAction('actualizar');
-                }}
-                color="primary"
-                disabled={!firstName || !lastName || !selectedSpecialty}
-              >
-                Actualizar
-              </Button>
-              <Button
-                onClick={() => {
-                  setConfirmOpen(true);
-                  setAction('eliminar');
-                }}
-                color="secondary"
-              >
-                Eliminar
-              </Button>
-            </>
-          ) : (
-            <Button
-              onClick={() => {
-                setConfirmOpen(true);
-                setAction('agregar');
-              }}
-              color="primary"
-              disabled={!firstName || !lastName || !selectedSpecialty}
+
+          {/* Fila 2 */}
+          <Box display="flex" justifyContent="space-between">
+            {/* Columna 1 */}
+            <Box width="450px" mr={2}>
+              <Box mb={2}>
+                <TextField label="Nombre" value={firstName} onChange={(e) => setFirstName(e.target.value)} fullWidth />
+              </Box>
+              <Box mb={2}>
+                <TextField label="A. Paterno" value={lastName} onChange={(e) => setLastName(e.target.value)} fullWidth />
+              </Box>
+              <Box mb={2}>
+                <TextField
+                  label="A. Materno"
+                  value={middleName}
+                  onChange={(e) => setMiddleName(e.target.value)}
+                  fullWidth
+                />
+              </Box>
+              <Box>
+                <FormControl fullWidth>
+                  {/* <InputLabel>Especialidad</InputLabel> */}
+                  <Select
+                    value={selectedSpecialty}
+                    onChange={(e) => {
+                      const selectedSpecialtyId = e.target.value as string;
+                      const selectedSpecialtyName =
+                        initialSpecialties.find((specialty) => specialty._id === selectedSpecialtyId)?.name || '';
+                      setSelectedSpecialty(selectedSpecialtyId);
+                      setSpecialty(selectedSpecialtyName); // Establecer el nombre de la especialidad en el estado specialty
+                    }}
+                  >
+                    {initialSpecialties.map((specialty) => (
+                      <MenuItem key={specialty._id} value={specialty._id}>
+                        {specialty.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <FormHelperText>Seleccione una especialidad</FormHelperText>
+                </FormControl>
+              </Box>
+            </Box>
+
+            {/* Columna 2 */}
+            <Box
+              width="450px"
+              height="270px"
+              marginTop="10px"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              // boxShadow="0px 0px 10px 3px rgba(240, 240, 240, 0.5)" // Luz brillante de color #f0f0f0
             >
-              Agregar
+              <Tooltip title="Buscar imagen">
+                <Box mb={2} textAlign="center">
+                  <input
+                    id="fileInput"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files && e.target.files[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          if (reader.result) {
+                            setPhoto(reader.result.toString());
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                  <label htmlFor="fileInput">
+                    <img
+                      src={photo || 'https://bucket-harmony.s3.amazonaws.com/defualt2.png'}
+                      alt="Preview"
+                      style={{
+                        width: '100%',
+                        height: '270px',
+                        cursor: 'pointer',
+                        objectFit: 'fill', // La imagen se ajusta al tamaño definido sin deformarse
+                      }}
+                    />
+                  </label>
+                </Box>
+              </Tooltip>
+            </Box>
+          </Box>
+
+          {/* Fila 3 */}
+          <Box mt={2} display="flex" justifyContent="space-between">
+            <Button onClick={closeModal} variant="outlined" color="error">
+              Cancelar
             </Button>
-          )}
-        </DialogActions>
+            {selectedUser ? (
+              <>
+                <Button
+                  onClick={() => {
+                    setConfirmOpen(true);
+                    setAction('actualizar');
+                  }}
+                  variant="contained"
+                  color="primary"
+                  disabled={!firstName || !lastName || !selectedSpecialty}
+                >
+                  Actualizar
+                </Button>
+                <Button
+                  onClick={() => {
+                    setConfirmOpen(true);
+                    setAction('eliminar');
+                  }}
+                  variant="contained"
+                  color="error"
+                >
+                  Eliminar
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={() => {
+                  setConfirmOpen(true);
+                  setAction('agregar');
+                }}
+                variant="contained"
+                color="primary"
+                disabled={!firstName || !lastName || !middleName || !selectedSpecialty}
+              >
+                Agregar
+              </Button>
+            )}
+          </Box>
+        </DialogContent>
       </Dialog>
 
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>{`¿Estás seguro que deseas ${action}?`}</DialogTitle>
         <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)} color="primary">
+          <Button onClick={() => setConfirmOpen(false)} color="error" variant="outlined">
             Cancelar
           </Button>
           <Button
@@ -415,7 +488,8 @@ const UserList = () => {
               if (action === 'actualizar') handleUpdateUser();
               setConfirmOpen(false);
             }}
-            color="secondary"
+            variant="contained"
+            color="primary"
           >
             Confirmar
           </Button>
@@ -436,12 +510,18 @@ const UserList = () => {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={users.length}
+        count={filteredUsers.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+      <br />
+      <div>
+        <Button variant="contained" color="primary" onClick={() => openModal(selectedUserId)}>
+          Nuevo
+        </Button>
+      </div>
     </Container>
   );
 };

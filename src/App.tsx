@@ -33,7 +33,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './components/pages/HomePage';
 import LoginPage from './components/organisms/LoginPage';
 import AdminTemplate from './components/templates/AdminTemplate';
-import EmployeePage from './components/pages/Employees/EmployeePage';
 import AppointmentPage from './components/pages/Appointments/AppointmentPage';
 
 import UserList from './components/pages/Users/UserListPage';

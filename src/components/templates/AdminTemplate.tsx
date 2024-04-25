@@ -116,26 +116,38 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
         <AppBar position="static" sx={{ backgroundColor: '#00D6B2' }}>
           <Toolbar>
             {/* Menú desplegable */}
-            <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerOpen}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={handleDrawerOpen}
+              // style={{ backgroundColor: 'yellow' }}
+            >
               <MenuIcon />
             </IconButton>
             {/* Título de la aplicación */}
-            {/* Título de la aplicación con logo */}
-            <Typography variant="h6" component="div" sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-              {/* <img
-                src="https://ruta-de-la-imagen/logo.png" // Aquí coloca la URL de tu imagen de logo
-                alt="Logo"
-                style={{
-                  width: 'auto',
-                  height: '50px',
-                  marginRight: '16px',
-                }} // Establece el tamaño y el margen derecho
-              /> */}
+
+            {/* <Tooltip title="H A R M O N Y"> */}
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, color: 'yellow' }}
+            >
               H A R M O N Y
+              {/* <img
+                  src="https://e7.pngegg.com/pngimages/303/436/png-clipart-cabinet-de-physiotherapie-y-physio-logo-physical-therapy-organization-physiotherapist-physiotherapie-logo-text-logo.png" // Aquí coloca la URL de tu imagen de logo
+                  alt="Logo"
+                  style={{
+                    width: 'auto',
+                    height: '50px',
+                    marginRight: '16px',
+                  }}
+                /> */}
             </Typography>
+            {/* </Tooltip> */}
 
             {/* Menú de perfil */}
-            <Tooltip title="Brandon Baushel Hernandez Granados">
+            {/* <Tooltip title="Brandon Baushel Hernandez Granados">
               <IconButton color="inherit" onClick={handleMenuOpen}>
                 <Avatar
                   alt="Profile"
@@ -143,7 +155,7 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
                   sx={{ width: 50, height: 50 }} // Ancho y alto personalizados
                 />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
           </Toolbar>
         </AppBar>
         {children}
