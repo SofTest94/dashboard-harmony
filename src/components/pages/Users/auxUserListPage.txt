@@ -23,6 +23,9 @@ import {
   Container,
   FormHelperText,
   Tooltip,
+  Alert,
+  AlertTitle,
+  Stack,
 } from '@mui/material';
 
 import { userServices } from '../../../services/users/users';
@@ -58,8 +61,18 @@ const UserList = () => {
   const [v, setV] = useState<number>(0);
   const [specialty, setSpecialty] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
+
+  const closeSuccessMessage = () => {
+    setTimeout(() => {
+      setSuccessMessage('');
+    }, 10000); // 10000 milisegundos = 10 segundos
+  };
 
   useEffect(() => {
+    if (successMessage) {
+      closeSuccessMessage();
+    }
     const fetchUsers = async () => {
       try {
         const response = await userServices.getAllUsers('', '', page, rowsPerPage);
@@ -89,6 +102,7 @@ const UserList = () => {
 
   const openModal = (userId: string, user: Users | null = null) => {
     const selectedUserData = users.find((u) => u._id === userId);
+
     if (selectedUserData) {
       setSelectedUser(selectedUserData);
       setSelectedUserId(userId);
@@ -139,9 +153,10 @@ const UserList = () => {
     // Crear el usuario con la foto y los demás datos
     await userServices.createUser(newUser, '');
 
-    // Actualizar el estado de los usuarios
-    let updatedUsers = [...users, newUser];
+    // Obtener la lista actualizada de usuarios después de agregar uno nuevo
+    const updatedUsers = await userServices.getAllUsers('', '', page, rowsPerPage);
 
+    // Actualizar el estado con la lista actualizada de usuarios
     setUsers(updatedUsers);
 
     // Limpiar los campos
@@ -151,8 +166,9 @@ const UserList = () => {
     closeModal();
 
     // Mostrar ventana modal de éxito
-    setAction('agregar');
-    setSuccessOpen(true);
+    setAction('AGREGADO');
+    setSuccessOpen(true); // Mostrar el diálogo de éxito
+    setSuccessMessage(`Usuario agregado correctamente`);
   };
 
   const handleUpdateUser = async () => {
@@ -210,27 +226,42 @@ const UserList = () => {
       setUsers(updatedUsers);
       clearInputFields();
       closeModal();
-      setAction('actualizar');
-      setSuccessOpen(true);
+      setAction('MODIFICADO');
+      setSuccessOpen(true); // Mostrar el diálogo de éxito
+      setSuccessMessage(`Usuario modificado correctamente`);
     }
   };
 
   const handleDeleteUser = async () => {
     if (selectedUser) {
-      const updatedUsers = users.filter((user) => user._id !== selectedUser._id);
-      console.log(selectedUser._id);
-      await userServices.deleteUser(selectedUser._id, '');
-      setUsers(updatedUsers);
-      clearInputFields();
-      closeModal();
-      setAction('eliminar');
-      setSuccessOpen(true);
+      try {
+        // Eliminar el usuario del backend
+        await userServices.deleteUser(selectedUser._id, '');
+
+        // Filtrar la lista de usuarios para excluir al usuario eliminado
+        const updatedUsers = users.filter((user) => user._id !== selectedUser._id);
+
+        // Actualizar el estado con la lista filtrada de usuarios
+        setUsers(updatedUsers);
+
+        // Limpiar los campos y cerrar la modal
+        clearInputFields();
+        closeModal();
+
+        // Mostrar ventana modal de éxito
+        setAction('ELIMINADO');
+        setSuccessOpen(true); // Mostrar el diálogo de éxito
+        setSuccessMessage(`Usuario eliminado correctamente`);
+      } catch (error) {
+        console.error('Error al eliminar el usuario:', error);
+      }
     }
   };
 
   const closeModal = () => {
     clearInputFields();
     setModalOpen(false);
+    setSuccessOpen(false); // Ocultar el diálogo de éxito
   };
 
   const clearInputFields = () => {
@@ -250,6 +281,7 @@ const UserList = () => {
     setV(0);
     setSpecialty('');
     setSelectedUser(null);
+    setSelectedSpecialty('');
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -277,6 +309,19 @@ const UserList = () => {
     <Container component="main" maxWidth="md">
       <br />
       <br />
+      {successMessage && (
+        <Stack sx={{ width: '100%' }} spacing={2}>
+          <Alert
+            severity="success"
+            onClose={() => {
+              setSuccessMessage('');
+            }}
+          >
+            <AlertTitle>{action}</AlertTitle>
+            {successMessage}
+          </Alert>
+        </Stack>
+      )}
       <Typography variant="h3" align="justify">
         LISTADO DE EMPLEADOS
       </Typography>
@@ -322,7 +367,6 @@ const UserList = () => {
         </Table>
       </TableContainer>
 
-      {/* <Dialog open={modalOpen} onClose={closeModal} disableEscapeKeyDown> */}
       <Dialog
         open={modalOpen}
         onClose={(event, reason) => {
@@ -334,11 +378,7 @@ const UserList = () => {
         <DialogTitle>{selectedUser ? 'Actualizar Usuario' : 'Agregar Nuevo Usuario'}</DialogTitle>
         <DialogContent style={{ maxWidth: '600px', overflow: 'hidden' }}>
           {/* Fila 1 */}
-          <Box mb={2} display="flex" justifyContent="center">
-            {/* <Typography variant="h6" align="center">
-              {selectedUser ? 'Actualizar' : 'Agregar'}
-            </Typography> */}
-          </Box>
+          <Box mb={2} display="flex" justifyContent="center"></Box>
 
           {/* Fila 2 */}
           <Box display="flex" justifyContent="space-between">
@@ -360,7 +400,6 @@ const UserList = () => {
               </Box>
               <Box>
                 <FormControl fullWidth>
-                  {/* <InputLabel>Especialidad</InputLabel> */}
                   <Select
                     value={selectedSpecialty}
                     onChange={(e) => {
@@ -390,7 +429,6 @@ const UserList = () => {
               display="flex"
               flexDirection="column"
               justifyContent="center"
-              // boxShadow="0px 0px 10px 3px rgba(240, 240, 240, 0.5)" // Luz brillante de color #f0f0f0
             >
               <Tooltip title="Buscar imagen">
                 <Box mb={2} textAlign="center">
@@ -420,7 +458,7 @@ const UserList = () => {
                         width: '100%',
                         height: '270px',
                         cursor: 'pointer',
-                        objectFit: 'fill', // La imagen se ajusta al tamaño definido sin deformarse
+                        objectFit: 'fill',
                       }}
                     />
                   </label>
@@ -492,17 +530,6 @@ const UserList = () => {
             color="primary"
           >
             Confirmar
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={successOpen} onClose={() => setSuccessOpen(false)}>
-        <DialogTitle>{`Usuario ${
-          action === 'agregar' ? 'agregado' : action === 'eliminar' ? 'eliminado' : 'actualizado'
-        } correctamente`}</DialogTitle>
-        <DialogActions>
-          <Button onClick={() => setSuccessOpen(false)} color="primary">
-            Cerrar
           </Button>
         </DialogActions>
       </Dialog>
