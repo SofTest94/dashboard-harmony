@@ -102,6 +102,18 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
           <ListItem
             button
             component={RouterLink}
+            to="/partners"
+            selected={selectedIndex === 1}
+            onClick={() => handleMenuItemClick(1)}
+          >
+            <GroupIcon sx={{ mr: 1 }} color={selectedIndex === 1 ? 'primary' : 'inherit'} />
+            <ListItemText primary="Socios" />
+          </ListItem>
+          <Divider />
+
+          <ListItem
+            button
+            component={RouterLink}
             to="/treatments"
             selected={selectedIndex === 2}
             onClick={() => handleMenuItemClick(2)}
