@@ -26,19 +26,18 @@ import {
 } from '@mui/material';
 
 import { treatmentsServices } from '../../../services/treatments/treatments';
-import { CreateTreatments, Treatments, UpdateTreatments } from '../../types/treatments';
 import { awsServices } from '../../../services/aws/aws'; // Importar awsServices
-// import { reviewServices } from '../../../services/reviews/reviews';
+import { Treatments, UpdateTreatments, CreateTreatments } from '../../types/treatments';
 
-const TreatmentList = () => {
+const TreatmentsList = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [successOpen, setSuccessOpen] = useState<boolean>(false);
   const [action, setAction] = useState<string>('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [reviews, setReviews] = useState<Treatments[]>([]);
-  const [selectedReview, setSelectedReview] = useState<Treatments | null>(null);
+  const [treatments, setTreatments] = useState<Treatments[]>([]);
+  const [selectedTreatment, setSelectedTreatment] = useState<Treatments>();
   const [img, setImg] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
@@ -59,34 +58,35 @@ const TreatmentList = () => {
     if (successMessage) {
       closeSuccessMessage();
     }
-    const fetchReviews = async () => {
+    const fetchTreatments = async () => {
       try {
         const response = await treatmentsServices.getAllTreatments('');
-        setReviews(response);
+        setTreatments(response);
       } catch (error) {
-        console.error('Error fetching reviews:', error);
+        console.error('Error fetching treatments:', error);
       }
     };
 
-    fetchReviews();
+    fetchTreatments();
   }, []);
 
-  const openModal = (reviewId: string, review: Treatments | null = null) => {
-    const selectedReviewData = reviews.find((r) => r._id === reviewId);
+  const openModal = (TreatmentId: string, treatment: Treatments | null = null) => {
+    const selectedTreatmentData = treatments.find((r) => r._id === TreatmentId);
 
-    if (selectedReviewData) {
-      setSelectedReview(selectedReviewData);
-      setTitle(selectedReviewData.title);
-      setDescription(selectedReviewData.description);
-      setImg(selectedReviewData.img);
+    console.log(selectedTreatmentData?.img);
+    if (selectedTreatmentData) {
+      setSelectedTreatment(selectedTreatmentData);
+      setTitle(selectedTreatmentData.title);
+      setDescription(selectedTreatmentData.description);
+      setImg(selectedTreatmentData.img);
     } else {
       clearInputFields();
     }
     setModalOpen(true);
   };
 
-  const handleAddReview = async () => {
-    const newReview: CreateTreatments = {
+  const handleAddTreatment = async () => {
+    const newTreatment: CreateTreatments = {
       img,
       title,
       description,
@@ -97,76 +97,75 @@ const TreatmentList = () => {
       if (fileInput && fileInput.files && fileInput.files[0]) {
         const file = fileInput.files[0];
         const photoUrl: any = await awsServices.insertImgInS3(file, ''); // Subir imagen al servicio S3
-        newReview.img = decodeURIComponent(photoUrl.fileUrl); // Actualizar URL de imagen en la reseña
+        newTreatment.img = decodeURIComponent(photoUrl.fileUrl); // Actualizar URL de imagen en la reseña
         setUpdatePhoto(true); // Se ha cargado una nueva foto
       }
 
-      await treatmentsServices.createTreatments(newReview, ''); // Crear la reseña en el backend
-      const updatedReviews = await treatmentsServices.getAllTreatments('');
-      setReviews(updatedReviews);
+      await treatmentsServices.createTreatments(newTreatment, ''); // Crear la reseña en el backend
+      const updatedTreatments = await treatmentsServices.getAllTreatments('');
+      setTreatments(updatedTreatments);
       clearInputFields();
       closeModal();
-      setAction('AGREGADA');
+      setAction('¡AGREGADO EXITOSAMENTE!');
       setSuccessOpen(true);
-      setSuccessMessage('Tratamiento agregado correctamente');
+      setSuccessMessage('Se ha dado de alta correctamente.');
       // setConfirmOpen(true); // Aquí se cierra la modal de confirmación después de eliminar la reseña
     } catch (error) {
-      console.error('Error al agregar un tratamiento:', error);
+      console.error('Error al agregar tratamiento:', error);
     }
   };
 
-  const handleUpdateReview = async () => {
-    if (selectedReview) {
-      setUpdating(true); // Mostrar fondo oscuro y el indicador de carga
-
-      const updatedReview: UpdateTreatments = {
-        _id: selectedReview._id,
-        img,
-        title,
-        description,
-      };
-
-      try {
-        if (updatePhoto) {
-          const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-          if (fileInput && fileInput.files && fileInput.files[0]) {
-            const file = fileInput.files[0];
-            const photoUrl: any = await awsServices.insertImgInS3(file, '');
-            updatedReview.img = decodeURIComponent(photoUrl.fileUrl); // Actualizar URL de imagen en la reseña
-          }
-        }
-
-        await treatmentsServices.updateById(selectedReview._id, updatedReview, ''); // Actualizar la reseña en el backend
-        const updatedReviews = reviews.map((review) =>
-          review._id === selectedReview._id ? { ...review, img, title, description } : review
-        );
-
-        setReviews(updatedReviews);
-        clearInputFields();
-        closeModal();
-        setAction('ACTUALIZADA');
-        setSuccessOpen(true);
-        setSuccessMessage('Tratamiento actualizado correctamente');
-        setUpdating(false); // Ocultar fondo oscuro y el indicador de carga después de completar la actualización
-        setConfirmOpen(false); // Aquí se cierra la modal de confirmación después de eliminar la reseña
-      } catch (error) {
-        console.error('Error al actualizar tratamiento:', error);
+  const handleUpdateTreatment = async () => {
+    let auxImg = img;
+    console.log({ selectedTreatment: selectedTreatment });
+    console.log({ img });
+    const updatedTreatment: UpdateTreatments = {
+      img,
+      title,
+      description,
+    };
+    if (img.includes('bucket-harmony')) {
+      console.log('es la misma imagen');
+    } else {
+      console.log('ya busco nuna nueva');
+      const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        console.log('entro aqui: ');
+        console.log({ file });
+        const photoUrl: any = await awsServices.insertImgInS3(file, '');
+        console.log(photoUrl);
+        auxImg = decodeURIComponent(photoUrl.fileUrl); // Actualizar URL de imagen en la reseña
       }
     }
+    updatedTreatment.img = auxImg;
+    console.log(updatedTreatment);
+    await treatmentsServices.updateById(selectedTreatment!._id, updatedTreatment, ''); // Actualizar la reseña en el backend
+    const updatedTreatments = treatments.map((treatment) =>
+      treatment._id === selectedTreatment!._id ? { ...treatment, img: auxImg, title, description } : treatment
+    );
+    setTreatments(updatedTreatments);
+    clearInputFields();
+    closeModal();
+    setAction('¡ACTUALIZACIÓN ÉXITOSA!');
+    setSuccessOpen(true);
+    setSuccessMessage('Tratamiento actualizado: ' + title);
+    setUpdating(false); // Ocultar fondo oscuro y el indicador de carga después de completar la actualización
+    setConfirmOpen(false); // Aquí se cierra la modal de confirmación después de eliminar la reseña
   };
 
-  const handleDeleteReview = async () => {
-    if (selectedReview) {
+  const handleDeleteTreatment = async () => {
+    if (selectedTreatment) {
       try {
-        await treatmentsServices.deleteTreatments(selectedReview._id, '');
-        const updatedReviews = reviews.filter((review) => review._id !== selectedReview._id);
+        await treatmentsServices.deleteTreatments(selectedTreatment._id, '');
+        const updatedTreatments = treatments.filter((treatment) => treatment._id !== selectedTreatment._id);
 
-        setReviews(updatedReviews);
+        setTreatments(updatedTreatments);
         clearInputFields();
         closeModal();
-        setAction('ELIMINADA');
+        setAction('¡ELIMINACIÓN ÉXITOSA!');
         setSuccessOpen(true);
-        setSuccessMessage('Tratamiento eliminado correctamente');
+        setSuccessMessage('Tratamiento eliminado: ' + title);
         setConfirmOpen(false); // Aquí se cierra la modal de confirmación después de eliminar la reseña
       } catch (error) {
         console.error('Error al eliminar tratamiento:', error);
@@ -183,8 +182,8 @@ const TreatmentList = () => {
   const clearInputFields = () => {
     setTitle('');
     setDescription('');
-    setImg('https://bucket-harmony.s3.amazonaws.com/tratamientos.jpeg');
-    setSelectedReview(null);
+    setImg('https://bucket-harmony.s3.amazonaws.com/sss.jpeg');
+    setSelectedTreatment(undefined);
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -204,8 +203,8 @@ const TreatmentList = () => {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   };
 
-  const filteredReviews = reviews.filter((review) =>
-    normalizeString(review.title).toLowerCase().includes(normalizeString(searchTerm).toLowerCase())
+  const filteredTreatments = treatments.filter((treatment) =>
+    normalizeString(treatment.title).toLowerCase().includes(normalizeString(searchTerm).toLowerCase())
   );
 
   return (
@@ -230,7 +229,7 @@ const TreatmentList = () => {
         </Stack>
       )}
       <Typography variant="h3" align="justify">
-        TIPOS DE TRATAMIENTOS
+        LISTADO DE TRATAMIENTOS
       </Typography>
       <Tooltip title="Buscar por nombre">
         <TextField
@@ -250,22 +249,22 @@ const TreatmentList = () => {
             <TableRow>
               <TableCell style={{ fontWeight: 700 }}>NOMBRE</TableCell>
               <TableCell style={{ fontWeight: 700 }}>DESCRIPCIÓN</TableCell>
-              <TableCell style={{ fontWeight: 700 }}>IMAGEN</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>LOGOTIPO</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredReviews.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((review) => (
+            {filteredTreatments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((reatment) => (
               <TableRow
-                key={review._id}
-                onClick={() => openModal(review._id, review)}
+                key={reatment._id}
+                onClick={() => openModal(reatment._id, reatment)}
                 style={{ cursor: 'pointer' }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f5f5f5')}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'inherit')}
               >
-                <TableCell>{review.title}</TableCell>
-                <TableCell>{review.description}</TableCell>
+                <TableCell>{reatment.title}</TableCell>
+                <TableCell>{reatment.description}</TableCell>
                 <TableCell>
-                  <img src={review.img} alt="Review" style={{ width: '100px', height: '100px' }} />
+                  <img src={reatment.img} alt="Treatment" style={{ width: '100px', height: '100px' }} />
                 </TableCell>
               </TableRow>
             ))}
@@ -275,18 +274,18 @@ const TreatmentList = () => {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={filteredReviews.length}
+        count={filteredTreatments.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
       <Dialog open={modalOpen} onClose={closeModal}>
-        <DialogTitle>{selectedReview ? 'Editar Tratamiento' : 'Agregar Tratamiento'}</DialogTitle>
+        <DialogTitle>{selectedTreatment ? 'Editar Tratamiento' : 'Agregar Tratamiento'}</DialogTitle>
         <DialogContent>
           <TextField
             margin="normal"
-            label="Nombre"
+            label="Nombre de la Empresa"
             variant="outlined"
             fullWidth
             value={title}
@@ -294,7 +293,7 @@ const TreatmentList = () => {
           />
           <TextField
             margin="normal"
-            label="Descripción"
+            label="Resumen"
             variant="outlined"
             fullWidth
             multiline
@@ -303,7 +302,7 @@ const TreatmentList = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
           {/* Input para cargar imágenes */}
-          <Tooltip title="Busca la imagen del tratamiento">
+          <Tooltip title="Buscar imagen">
             <Box mb={2} textAlign="center">
               <input
                 id="fileInput"
@@ -326,11 +325,11 @@ const TreatmentList = () => {
               <label htmlFor="fileInput">
                 <img
                   //
-                  src={img || 'https://bucket-harmony.s3.amazonaws.com/tratamientos.jpeg'}
+                  src={img || 'https://bucket-harmony.s3.amazonaws.com/sss.jpeg'}
                   alt="Preview"
                   style={{
-                    width: '100%',
-                    height: '200px',
+                    width: '33%',
+                    height: '130px',
                     cursor: 'pointer',
                     objectFit: 'fill',
                     // borderRadius: '50%',
@@ -342,7 +341,7 @@ const TreatmentList = () => {
           {/* Fin del input para cargar imágenes */}
         </DialogContent>
         <DialogActions>
-          {selectedReview && (
+          {selectedTreatment && (
             <Button onClick={() => setConfirmOpen(true)} variant="contained" color="error">
               Eliminar
             </Button>
@@ -351,12 +350,12 @@ const TreatmentList = () => {
             Cancelar
           </Button>
           <Button
-            onClick={selectedReview ? handleUpdateReview : handleAddReview}
+            onClick={selectedTreatment ? handleUpdateTreatment : handleAddTreatment}
             variant="contained"
             color="primary"
             disabled={!title || !description}
           >
-            {selectedReview ? 'Actualizar' : 'Agregar'}
+            {selectedTreatment ? 'Actualizar' : 'Agregar'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -369,7 +368,7 @@ const TreatmentList = () => {
           <Button onClick={() => setConfirmOpen(false)} variant="outlined" color="primary">
             Cancelar
           </Button>
-          <Button onClick={handleDeleteReview} variant="contained" color="error">
+          <Button onClick={handleDeleteTreatment} variant="contained" color="error">
             Eliminar
           </Button>
         </DialogActions>
@@ -381,4 +380,4 @@ const TreatmentList = () => {
   );
 };
 
-export default TreatmentList;
+export default TreatmentsList;

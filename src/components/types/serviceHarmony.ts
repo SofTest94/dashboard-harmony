@@ -6,7 +6,6 @@ export interface Services {
 }
 
 export interface UpdateServices {
-  _id: string;
   img: string;
   title: string;
   description: string;

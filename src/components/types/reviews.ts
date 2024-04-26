@@ -6,7 +6,6 @@ export interface Reviews {
 }
 
 export interface UpdateReviews {
-  _id: string;
   img: string;
   title: string;
   description: string;

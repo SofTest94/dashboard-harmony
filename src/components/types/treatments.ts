@@ -6,7 +6,6 @@ export interface Treatments {
 }
 
 export interface UpdateTreatments {
-  _id: string;
   img: string;
   title: string;
   description: string;

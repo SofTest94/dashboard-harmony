@@ -26,9 +26,8 @@ import {
 } from '@mui/material';
 
 import { partnerServices } from '../../../services/partners/partners';
-import { CreateReviews, Reviews, UpdateReviews } from '../../types/reviews';
 import { awsServices } from '../../../services/aws/aws'; // Importar awsServices
-// import { reviewServices } from '../../../services/reviews/reviews';
+import { Partners, UpdatePartners, CreatePartners } from '../../types/partners';
 
 const PartnerList = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -37,8 +36,8 @@ const PartnerList = () => {
   const [action, setAction] = useState<string>('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [reviews, setReviews] = useState<Reviews[]>([]);
-  const [selectedReview, setSelectedReview] = useState<Reviews | null>(null);
+  const [partners, setPartners] = useState<Partners[]>([]);
+  const [selectedPartner, setSelectedPartner] = useState<Partners>();
   const [img, setImg] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
@@ -59,34 +58,35 @@ const PartnerList = () => {
     if (successMessage) {
       closeSuccessMessage();
     }
-    const fetchReviews = async () => {
+    const fetchPartners = async () => {
       try {
         const response = await partnerServices.getAllPartners('');
-        setReviews(response);
+        setPartners(response);
       } catch (error) {
-        console.error('Error fetching reviews:', error);
+        console.error('Error fetching partners:', error);
       }
     };
 
-    fetchReviews();
+    fetchPartners();
   }, []);
 
-  const openModal = (reviewId: string, review: Reviews | null = null) => {
-    const selectedReviewData = reviews.find((r) => r._id === reviewId);
+  const openModal = (partnerId: string, partner: Partners | null = null) => {
+    const selectedPartnerData = partners.find((r) => r._id === partnerId);
 
-    if (selectedReviewData) {
-      setSelectedReview(selectedReviewData);
-      setTitle(selectedReviewData.title);
-      setDescription(selectedReviewData.description);
-      setImg(selectedReviewData.img);
+    console.log(selectedPartnerData?.img);
+    if (selectedPartnerData) {
+      setSelectedPartner(selectedPartnerData);
+      setTitle(selectedPartnerData.title);
+      setDescription(selectedPartnerData.description);
+      setImg(selectedPartnerData.img);
     } else {
       clearInputFields();
     }
     setModalOpen(true);
   };
 
-  const handleAddReview = async () => {
-    const newReview: CreateReviews = {
+  const handleAddPartner = async () => {
+    const newPartner: CreatePartners = {
       img,
       title,
       description,
@@ -97,77 +97,75 @@ const PartnerList = () => {
       if (fileInput && fileInput.files && fileInput.files[0]) {
         const file = fileInput.files[0];
         const photoUrl: any = await awsServices.insertImgInS3(file, ''); // Subir imagen al servicio S3
-        newReview.img = decodeURIComponent(photoUrl.fileUrl); // Actualizar URL de imagen en la reseña
+        newPartner.img = decodeURIComponent(photoUrl.fileUrl);
         setUpdatePhoto(true); // Se ha cargado una nueva foto
       }
 
-      await partnerServices.createPartner(newReview, ''); // Crear la reseña en el backend
-      const updatedReviews = await partnerServices.getAllPartners('');
-      setReviews(updatedReviews);
+      await partnerServices.createPartner(newPartner, '');
+      const updatedPartners = await partnerServices.getAllPartners('');
+      setPartners(updatedPartners);
       clearInputFields();
       closeModal();
       setAction('AGREGADA');
       setSuccessOpen(true);
       setSuccessMessage('Socio agregada correctamente');
-      // setConfirmOpen(true); // Aquí se cierra la modal de confirmación después de eliminar la reseña
     } catch (error) {
       console.error('Error al agregar socio:', error);
     }
   };
 
-  const handleUpdateReview = async () => {
-    if (selectedReview) {
-      setUpdating(true); // Mostrar fondo oscuro y el indicador de carga
-
-      const updatedReview: UpdateReviews = {
-        _id: selectedReview._id,
-        img,
-        title,
-        description,
-      };
-
-      try {
-        if (updatePhoto) {
-          const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-          if (fileInput && fileInput.files && fileInput.files[0]) {
-            const file = fileInput.files[0];
-            const photoUrl: any = await awsServices.insertImgInS3(file, '');
-            updatedReview.img = decodeURIComponent(photoUrl.fileUrl); // Actualizar URL de imagen en la reseña
-          }
-        }
-
-        await partnerServices.updateById(selectedReview._id, updatedReview, ''); // Actualizar la reseña en el backend
-        const updatedReviews = reviews.map((review) =>
-          review._id === selectedReview._id ? { ...review, img, title, description } : review
-        );
-
-        setReviews(updatedReviews);
-        clearInputFields();
-        closeModal();
-        setAction('ACTUALIZADA');
-        setSuccessOpen(true);
-        setSuccessMessage('Socio actualizado correctamente');
-        setUpdating(false); // Ocultar fondo oscuro y el indicador de carga después de completar la actualización
-        setConfirmOpen(false); // Aquí se cierra la modal de confirmación después de eliminar la reseña
-      } catch (error) {
-        console.error('Error al actualizar socio:', error);
+  const handleUpdatePartner = async () => {
+    let auxImg = img;
+    console.log({ selectedPartner: selectedPartner });
+    console.log({ img });
+    const updatedPartner: UpdatePartners = {
+      img,
+      title,
+      description,
+    };
+    if (img.includes('bucket-harmony')) {
+      console.log('es la misma imagen');
+    } else {
+      console.log('ya busco nuna nueva');
+      const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        console.log('entro aqui: ');
+        console.log({ file });
+        const photoUrl: any = await awsServices.insertImgInS3(file, '');
+        console.log(photoUrl);
+        auxImg = decodeURIComponent(photoUrl.fileUrl);
       }
     }
+    updatedPartner.img = auxImg;
+    console.log(updatedPartner);
+    await partnerServices.updateById(selectedPartner!._id, updatedPartner, '');
+    const updatedPartners = partners.map((partner) =>
+      partner._id === selectedPartner!._id ? { ...partner, img: auxImg, title, description } : partner
+    );
+    setPartners(updatedPartners);
+    clearInputFields();
+    closeModal();
+    setAction('ACTUALIZADA');
+    setSuccessOpen(true);
+    setSuccessMessage('Socio actualizado correctamente');
+    setUpdating(false); // Ocultar fondo oscuro y el indicador de carga después de completar la actualización
+    setConfirmOpen(false);
   };
 
-  const handleDeleteReview = async () => {
-    if (selectedReview) {
+  const handleDeletePartner = async () => {
+    if (selectedPartner) {
       try {
-        await partnerServices.deletePartner(selectedReview._id, '');
-        const updatedReviews = reviews.filter((review) => review._id !== selectedReview._id);
+        await partnerServices.deletePartner(selectedPartner._id, '');
+        const updatedPartners = partners.filter((partner) => partner._id !== selectedPartner._id);
 
-        setReviews(updatedReviews);
+        setPartners(updatedPartners);
         clearInputFields();
         closeModal();
         setAction('ELIMINADA');
         setSuccessOpen(true);
         setSuccessMessage('Socio eliminado correctamente');
-        setConfirmOpen(false); // Aquí se cierra la modal de confirmación después de eliminar la reseña
+        setConfirmOpen(false); // Aquí se cierra la modal de confirmación
       } catch (error) {
         console.error('Error al eliminar socio:', error);
       }
@@ -184,7 +182,7 @@ const PartnerList = () => {
     setTitle('');
     setDescription('');
     setImg('https://bucket-harmony.s3.amazonaws.com/default-logo.png');
-    setSelectedReview(null);
+    setSelectedPartner(undefined);
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -204,8 +202,8 @@ const PartnerList = () => {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   };
 
-  const filteredReviews = reviews.filter((review) =>
-    normalizeString(review.title).toLowerCase().includes(normalizeString(searchTerm).toLowerCase())
+  const filteredPartners = partners.filter((partner) =>
+    normalizeString(partner.title).toLowerCase().includes(normalizeString(searchTerm).toLowerCase())
   );
 
   return (
@@ -254,18 +252,18 @@ const PartnerList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredReviews.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((review) => (
+            {filteredPartners.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((partner) => (
               <TableRow
-                key={review._id}
-                onClick={() => openModal(review._id, review)}
+                key={partner._id}
+                onClick={() => openModal(partner._id, partner)}
                 style={{ cursor: 'pointer' }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f5f5f5')}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'inherit')}
               >
-                <TableCell>{review.title}</TableCell>
-                <TableCell>{review.description}</TableCell>
+                <TableCell>{partner.title}</TableCell>
+                <TableCell>{partner.description}</TableCell>
                 <TableCell>
-                  <img src={review.img} alt="Review" style={{ width: '100px', height: '100px' }} />
+                  <img src={partner.img} alt="Partner" style={{ width: '100px', height: '100px' }} />
                 </TableCell>
               </TableRow>
             ))}
@@ -275,14 +273,14 @@ const PartnerList = () => {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={filteredReviews.length}
+        count={filteredPartners.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
       <Dialog open={modalOpen} onClose={closeModal}>
-        <DialogTitle>{selectedReview ? 'Editar Socio' : 'Agregar Socio'}</DialogTitle>
+        <DialogTitle>{selectedPartner ? 'Editar Socio' : 'Agregar Socio'}</DialogTitle>
         <DialogContent>
           <TextField
             margin="normal"
@@ -342,7 +340,7 @@ const PartnerList = () => {
           {/* Fin del input para cargar imágenes */}
         </DialogContent>
         <DialogActions>
-          {selectedReview && (
+          {selectedPartner && (
             <Button onClick={() => setConfirmOpen(true)} variant="contained" color="error">
               Eliminar
             </Button>
@@ -351,12 +349,12 @@ const PartnerList = () => {
             Cancelar
           </Button>
           <Button
-            onClick={selectedReview ? handleUpdateReview : handleAddReview}
+            onClick={selectedPartner ? handleUpdatePartner : handleAddPartner}
             variant="contained"
             color="primary"
             disabled={!title || !description}
           >
-            {selectedReview ? 'Actualizar' : 'Agregar'}
+            {selectedPartner ? 'Actualizar' : 'Agregar'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -369,7 +367,7 @@ const PartnerList = () => {
           <Button onClick={() => setConfirmOpen(false)} variant="outlined" color="primary">
             Cancelar
           </Button>
-          <Button onClick={handleDeleteReview} variant="contained" color="error">
+          <Button onClick={handleDeletePartner} variant="contained" color="error">
             Eliminar
           </Button>
         </DialogActions>

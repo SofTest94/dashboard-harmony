@@ -26,18 +26,18 @@ import {
 } from '@mui/material';
 
 import { serviceServices } from '../../../services/serviceHarmony/service';
-import { CreateServices, Services, UpdateServices } from '../../types/serviceHarmony';
 import { awsServices } from '../../../services/aws/aws'; // Importar awsServices
+import { Services, UpdateServices, CreateServices } from '../../types/serviceHarmony';
 
-const ServiceList = () => {
+const ServicesList = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [successOpen, setSuccessOpen] = useState<boolean>(false);
   const [action, setAction] = useState<string>('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [reviews, setReviews] = useState<Services[]>([]);
-  const [selectedReview, setSelectedReview] = useState<Services | null>(null);
+  const [services, setServices] = useState<Services[]>([]);
+  const [selectedService, setSelectedService] = useState<Services>();
   const [img, setImg] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
@@ -58,34 +58,35 @@ const ServiceList = () => {
     if (successMessage) {
       closeSuccessMessage();
     }
-    const fetchReviews = async () => {
+    const fetchServices = async () => {
       try {
         const response = await serviceServices.getAllServices('');
-        setReviews(response);
+        setServices(response);
       } catch (error) {
         console.error('Error fetching services:', error);
       }
     };
 
-    fetchReviews();
+    fetchServices();
   }, []);
 
-  const openModal = (reviewId: string, review: Services | null = null) => {
-    const selectedReviewData = reviews.find((r) => r._id === reviewId);
+  const openModal = (serviceId: string, service: Services | null = null) => {
+    const selectedServiceData = services.find((r) => r._id === serviceId);
 
-    if (selectedReviewData) {
-      setSelectedReview(selectedReviewData);
-      setTitle(selectedReviewData.title);
-      setDescription(selectedReviewData.description);
-      setImg(selectedReviewData.img);
+    console.log(selectedServiceData?.img);
+    if (selectedServiceData) {
+      setSelectedService(selectedServiceData);
+      setTitle(selectedServiceData.title);
+      setDescription(selectedServiceData.description);
+      setImg(selectedServiceData.img);
     } else {
       clearInputFields();
     }
     setModalOpen(true);
   };
 
-  const handleAddReview = async () => {
-    const newReview: CreateServices = {
+  const handleAddService = async () => {
+    const newService: CreateServices = {
       img,
       title,
       description,
@@ -96,77 +97,76 @@ const ServiceList = () => {
       if (fileInput && fileInput.files && fileInput.files[0]) {
         const file = fileInput.files[0];
         const photoUrl: any = await awsServices.insertImgInS3(file, ''); // Subir imagen al servicio S3
-        newReview.img = decodeURIComponent(photoUrl.fileUrl); // Actualizar URL de imagen en la reseña
+        newService.img = decodeURIComponent(photoUrl.fileUrl); // Actualizar URL de imagen en la
         setUpdatePhoto(true); // Se ha cargado una nueva foto
       }
 
-      await serviceServices.createService(newReview, ''); // Crear la reseña en el backend
-      const updatedReviews = await serviceServices.getAllServices('');
-      setReviews(updatedReviews);
+      await serviceServices.createService(newService, ''); // Crear la  en el backend
+      const updatedServices = await serviceServices.getAllServices('');
+      setServices(updatedServices);
       clearInputFields();
       closeModal();
-      setAction('AGREGADA');
+      setAction('¡AGREGADO EXITOSAMENTE!');
       setSuccessOpen(true);
-      setSuccessMessage('Servicio agregado correctamente');
-      // setConfirmOpen(true); // Aquí se cierra la modal de confirmación después de eliminar la reseña
+      setSuccessMessage('Se ha dado de alta correctamente.');
+      // setConfirmOpen(true); // Aquí se cierra la modal de confirmación después de eliminar la
     } catch (error) {
       console.error('Error al agregar servicio:', error);
     }
   };
 
-  const handleUpdateReview = async () => {
-    if (selectedReview) {
-      setUpdating(true); // Mostrar fondo oscuro y el indicador de carga
-
-      const updatedReview: UpdateServices = {
-        _id: selectedReview._id,
-        img,
-        title,
-        description,
-      };
-
-      try {
-        if (updatePhoto) {
-          const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-          if (fileInput && fileInput.files && fileInput.files[0]) {
-            const file = fileInput.files[0];
-            const photoUrl: any = await awsServices.insertImgInS3(file, '');
-            updatedReview.img = decodeURIComponent(photoUrl.fileUrl); // Actualizar URL de imagen en la reseña
-          }
-        }
-
-        await serviceServices.updateById(selectedReview._id, updatedReview, ''); // Actualizar la reseña en el backend
-        const updatedReviews = reviews.map((review) =>
-          review._id === selectedReview._id ? { ...review, img, title, description } : review
-        );
-
-        setReviews(updatedReviews);
-        clearInputFields();
-        closeModal();
-        setAction('ACTUALIZADA');
-        setSuccessOpen(true);
-        setSuccessMessage('Servicio actualizado correctamente');
-        setUpdating(false); // Ocultar fondo oscuro y el indicador de carga después de completar la actualización
-        setConfirmOpen(false); // Aquí se cierra la modal de confirmación después de eliminar la reseña
-      } catch (error) {
-        console.error('Error al actualizar servicio:', error);
+  const handleUpdateService = async () => {
+    let auxImg = img;
+    console.log({ selectedService: selectedService });
+    console.log({ img });
+    const updatedService: UpdateServices = {
+      img,
+      title,
+      description,
+    };
+    if (img.includes('bucket-harmony')) {
+      console.log('es la misma imagen');
+    } else {
+      console.log('ya busco nuna nueva');
+      const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        console.log('entro aqui: ');
+        console.log({ file });
+        const photoUrl: any = await awsServices.insertImgInS3(file, '');
+        console.log(photoUrl);
+        auxImg = decodeURIComponent(photoUrl.fileUrl); // Actualizar URL de imagen en la
       }
     }
+    updatedService.img = auxImg;
+    console.log(updatedService);
+    await serviceServices.updateById(selectedService!._id, updatedService, ''); // Actualizar la  en el backend
+    const updatedServices = services.map((service) =>
+      service._id === selectedService!._id ? { ...service, img: auxImg, title, description } : service
+    );
+    setServices(updatedServices);
+    clearInputFields();
+    closeModal();
+    setAction('¡ACTUALIZACIÓN ÉXITOSA!');
+    setSuccessOpen(true);
+    setSuccessMessage('Servicio actualizado: ' + title);
+    setUpdating(false); // Ocultar fondo oscuro y el indicador de carga después de completar la actualización
+    setConfirmOpen(false); // Aquí se cierra la modal de confirmación después de eliminar la
   };
 
-  const handleDeleteReview = async () => {
-    if (selectedReview) {
+  const handleDeleteService = async () => {
+    if (selectedService) {
       try {
-        await serviceServices.deleteServices(selectedReview._id, '');
-        const updatedReviews = reviews.filter((review) => review._id !== selectedReview._id);
+        await serviceServices.deleteServices(selectedService._id, '');
+        const updatedServices = services.filter((service) => service._id !== selectedService._id);
 
-        setReviews(updatedReviews);
+        setServices(updatedServices);
         clearInputFields();
         closeModal();
-        setAction('ELIMINADA');
+        setAction('¡ELIMINACIÓN ÉXITOSA!');
         setSuccessOpen(true);
-        setSuccessMessage('Servicio eliminado correctamente');
-        setConfirmOpen(false); // Aquí se cierra la modal de confirmación después de eliminar la reseña
+        setSuccessMessage('Servicio eliminado: ' + title);
+        setConfirmOpen(false); // Aquí se cierra la modal de confirmación después de eliminar la
       } catch (error) {
         console.error('Error al eliminar servicio:', error);
       }
@@ -182,8 +182,8 @@ const ServiceList = () => {
   const clearInputFields = () => {
     setTitle('');
     setDescription('');
-    setImg('https://bucket-harmony.s3.amazonaws.com/servicios.jpeg');
-    setSelectedReview(null);
+    setImg('https://bucket-harmony.s3.amazonaws.com/servi.webp');
+    setSelectedService(undefined);
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -203,8 +203,8 @@ const ServiceList = () => {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   };
 
-  const filteredReviews = reviews.filter((review) =>
-    normalizeString(review.title).toLowerCase().includes(normalizeString(searchTerm).toLowerCase())
+  const filteredServices = services.filter((service) =>
+    normalizeString(service.title).toLowerCase().includes(normalizeString(searchTerm).toLowerCase())
   );
 
   return (
@@ -229,7 +229,7 @@ const ServiceList = () => {
         </Stack>
       )}
       <Typography variant="h3" align="justify">
-        LISTADO DE SERVICIO
+        LISTADO DE SERVICIOS
       </Typography>
       <Tooltip title="Buscar por nombre">
         <TextField
@@ -249,22 +249,22 @@ const ServiceList = () => {
             <TableRow>
               <TableCell style={{ fontWeight: 700 }}>NOMBRE</TableCell>
               <TableCell style={{ fontWeight: 700 }}>DESCRIPCIÓN</TableCell>
-              <TableCell style={{ fontWeight: 700 }}>IMAGEN</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>LOGOTIPO</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredReviews.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((review) => (
+            {filteredServices.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((service) => (
               <TableRow
-                key={review._id}
-                onClick={() => openModal(review._id, review)}
+                key={service._id}
+                onClick={() => openModal(service._id, service)}
                 style={{ cursor: 'pointer' }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f5f5f5')}
                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'inherit')}
               >
-                <TableCell>{review.title}</TableCell>
-                <TableCell>{review.description}</TableCell>
+                <TableCell>{service.title}</TableCell>
+                <TableCell>{service.description}</TableCell>
                 <TableCell>
-                  <img src={review.img} alt="Services" style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                  <img src={service.img} alt="Service" style={{ width: '100px', height: '100px' }} />
                 </TableCell>
               </TableRow>
             ))}
@@ -274,18 +274,18 @@ const ServiceList = () => {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={filteredReviews.length}
+        count={filteredServices.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
       <Dialog open={modalOpen} onClose={closeModal}>
-        <DialogTitle>{selectedReview ? 'Editar Servicio' : 'Agregar Servicio'}</DialogTitle>
+        <DialogTitle>{selectedService ? 'Editar Servicio' : 'Agregar Servicio'}</DialogTitle>
         <DialogContent>
           <TextField
             margin="normal"
-            label="Nombre"
+            label="Nombre de la Empresa"
             variant="outlined"
             fullWidth
             value={title}
@@ -293,7 +293,7 @@ const ServiceList = () => {
           />
           <TextField
             margin="normal"
-            label="Descripción"
+            label="Resumen"
             variant="outlined"
             fullWidth
             multiline
@@ -302,7 +302,7 @@ const ServiceList = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
           {/* Input para cargar imágenes */}
-          <Tooltip title="Buscar imagen representativa">
+          <Tooltip title="Buscar imagen">
             <Box mb={2} textAlign="center">
               <input
                 id="fileInput"
@@ -325,11 +325,11 @@ const ServiceList = () => {
               <label htmlFor="fileInput">
                 <img
                   //
-                  src={img || 'https://bucket-harmony.s3.amazonaws.com/servicios.jpeg'}
+                  src={img || 'https://bucket-harmony.s3.amazonaws.com/servi.webp'}
                   alt="Preview"
                   style={{
-                    width: '100%',
-                    height: '200px',
+                    width: '33%',
+                    height: '130px',
                     cursor: 'pointer',
                     objectFit: 'fill',
                     // borderRadius: '50%',
@@ -341,7 +341,7 @@ const ServiceList = () => {
           {/* Fin del input para cargar imágenes */}
         </DialogContent>
         <DialogActions>
-          {selectedReview && (
+          {selectedService && (
             <Button onClick={() => setConfirmOpen(true)} variant="contained" color="error">
               Eliminar
             </Button>
@@ -350,25 +350,25 @@ const ServiceList = () => {
             Cancelar
           </Button>
           <Button
-            onClick={selectedReview ? handleUpdateReview : handleAddReview}
+            onClick={selectedService ? handleUpdateService : handleAddService}
             variant="contained"
             color="primary"
             disabled={!title || !description}
           >
-            {selectedReview ? 'Actualizar' : 'Agregar'}
+            {selectedService ? 'Actualizar' : 'Agregar'}
           </Button>
         </DialogActions>
       </Dialog>
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>Confirmar Eliminación</DialogTitle>
         <DialogContent>
-          <Typography variant="body1">¿Está seguro de que desea eliminar este servicio?</Typography>
+          <Typography variant="body1">¿Está seguro de que desea eliminar esta servicio?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)} variant="outlined" color="primary">
             Cancelar
           </Button>
-          <Button onClick={handleDeleteReview} variant="contained" color="error">
+          <Button onClick={handleDeleteService} variant="contained" color="error">
             Eliminar
           </Button>
         </DialogActions>
@@ -380,4 +380,4 @@ const ServiceList = () => {
   );
 };
 
-export default ServiceList;
+export default ServicesList;

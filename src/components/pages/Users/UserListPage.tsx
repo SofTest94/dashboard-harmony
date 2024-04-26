@@ -58,7 +58,7 @@ const UserList = () => {
   const [updatePhoto, setUpdatePhoto] = useState<string>('');
   const [createdAt, setCreatedAt] = useState<string>('');
   const [updatedAt, setUpdatedAt] = useState<string>('');
-  const [v, setV] = useState<number>(0);  
+  const [v, setV] = useState<number>(0);
   const [specialty, setSpecialty] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
@@ -66,7 +66,7 @@ const UserList = () => {
   const closeSuccessMessage = () => {
     setTimeout(() => {
       setSuccessMessage('');
-    }, 10000); // 10000 milisegundos = 10 segundos
+    }, 5000); // 10000 milisegundos = 10 segundos
   };
 
   useEffect(() => {
@@ -166,9 +166,9 @@ const UserList = () => {
     closeModal();
 
     // Mostrar ventana modal de éxito
-    setAction('AGREGADO');
-    setSuccessOpen(true); // Mostrar el diálogo de éxito
-    setSuccessMessage(`Usuario agregado correctamente`);
+    setAction('AGREGADO EXITOSAMENTE!!!');
+    setSuccessOpen(true);
+    setSuccessMessage('Usuario registrado.');
   };
 
   const handleUpdateUser = async () => {
@@ -226,9 +226,9 @@ const UserList = () => {
       setUsers(updatedUsers);
       clearInputFields();
       closeModal();
-      setAction('MODIFICADO');
-      setSuccessOpen(true); // Mostrar el diálogo de éxito
-      setSuccessMessage(`Usuario modificado correctamente`);
+      setAction('SE ACTUALIZÓ EXITOSAMENTE!!!');
+      setSuccessOpen(true);
+      setSuccessMessage('Usuario actualizado: ' + firstName + ' ' + lastName + ' ' + middleName);
     }
   };
 
@@ -249,9 +249,9 @@ const UserList = () => {
         closeModal();
 
         // Mostrar ventana modal de éxito
-        setAction('ELIMINADO');
-        setSuccessOpen(true); // Mostrar el diálogo de éxito
-        setSuccessMessage(`Usuario eliminado correctamente`);
+        setAction('SE ELIMINO EXITOSAMENTE!!!');
+        setSuccessOpen(true);
+        setSuccessMessage('Usuario eliminado: ' + fullName);
       } catch (error) {
         console.error('Error al eliminar el usuario:', error);
       }
