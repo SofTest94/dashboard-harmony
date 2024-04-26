@@ -18,6 +18,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Link as RouterLink } from 'react-router-dom';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import HomeIcon from '@mui/icons-material/Home';
+import PersonIcon from '@mui/icons-material/Person';
+import ReviewsIcon from '@mui/icons-material/Reviews';
+import HandshakeIcon from '@mui/icons-material/Handshake';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
+
 import GroupIcon from '@mui/icons-material/Group';
 import EventIcon from '@mui/icons-material/Event';
 import Avatar from '@mui/material/Avatar';
@@ -78,34 +84,60 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
           <ListItem
             button
             component={RouterLink}
-            to="/home"
+            to="/"
             selected={selectedIndex === 0}
             onClick={() => handleMenuItemClick(0)}
           >
-            <HomeIcon sx={{ mr: 1 }} color={selectedIndex === 0 ? 'primary' : 'inherit'} />
-            <ListItemText primary="Inicio" />
-          </ListItem>
-          <Divider />
-          <ListItem
-            button
-            component={RouterLink}
-            to="/employees"
-            selected={selectedIndex === 1}
-            onClick={() => handleMenuItemClick(1)}
-          >
-            <GroupIcon sx={{ mr: 1 }} color={selectedIndex === 1 ? 'primary' : 'inherit'} />
+            <PersonIcon sx={{ mr: 1 }} color={selectedIndex === 0 ? 'primary' : 'inherit'} />
             <ListItemText primary="Empleados" />
           </ListItem>
           <Divider />
+
           <ListItem
             button
             component={RouterLink}
-            to="/appointments"
+            to="/reviews"
+            selected={selectedIndex === 1}
+            onClick={() => handleMenuItemClick(1)}
+          >
+            <ReviewsIcon sx={{ mr: 1 }} color={selectedIndex === 1 ? 'primary' : 'inherit'} />
+            <ListItemText primary="Reseñas" />
+          </ListItem>
+          <Divider />
+
+          <ListItem
+            button
+            component={RouterLink}
+            to="/partners"
             selected={selectedIndex === 2}
             onClick={() => handleMenuItemClick(2)}
           >
-            <EventIcon sx={{ mr: 1 }} color={selectedIndex === 2 ? 'primary' : 'inherit'} />
-            <ListItemText primary="Citas" />
+            <HandshakeIcon sx={{ mr: 1 }} color={selectedIndex === 2 ? 'primary' : 'inherit'} />
+            <ListItemText primary="Socios" />
+          </ListItem>
+          <Divider />
+
+          <ListItem
+            button
+            component={RouterLink}
+            to="/treatments"
+            selected={selectedIndex === 3}
+            onClick={() => handleMenuItemClick(3)}
+          >
+            <ManageAccountsIcon sx={{ mr: 1 }} color={selectedIndex === 3 ? 'primary' : 'inherit'} />
+            <ListItemText primary="Tratamientos" />
+          </ListItem>
+          <Divider />
+
+          <ListItem
+            button
+            component={RouterLink}
+            to="/services"
+            selected={selectedIndex === 4}
+            onClick={() => handleMenuItemClick(4)}
+          >
+            <SelfImprovementIcon sx={{ mr: 1 }} color={selectedIndex === 4 ? 'primary' : 'inherit'} />
+            <ListItemText primary="Servicios" />
           </ListItem>
           <Divider />
         </List>
@@ -113,29 +145,41 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
       {/* Contenido principal */}
       <div style={{ marginLeft: open ? 240 : 0, width: '100%', transition: 'margin-left 0.3s ease' }}>
         {/* AppBar */}
-        <AppBar position="static" sx={{ bgcolor: '#00D6B2' }}>
+        <AppBar position="static" sx={{ backgroundColor: '#00D6B2' }}>
           <Toolbar>
             {/* Menú desplegable */}
-            <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerOpen}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={handleDrawerOpen}
+              // style={{ backgroundColor: 'yellow' }}
+            >
               <MenuIcon />
             </IconButton>
             {/* Título de la aplicación */}
-            {/* Título de la aplicación con logo */}
-            <Typography variant="h6" component="div" sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-              {/* <img
-                src="https://ruta-de-la-imagen/logo.png" // Aquí coloca la URL de tu imagen de logo
-                alt="Logo"
-                style={{
-                  width: 'auto',
-                  height: '50px',
-                  marginRight: '16px',
-                }} // Establece el tamaño y el margen derecho
-              /> */}
+
+            {/* <Tooltip title="H A R M O N Y"> */}
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, color: 'yellow' }}
+            >
               H A R M O N Y
+              {/* <img
+                  src="https://e7.pngegg.com/pngimages/303/436/png-clipart-cabinet-de-physiotherapie-y-physio-logo-physical-therapy-organization-physiotherapist-physiotherapie-logo-text-logo.png" // Aquí coloca la URL de tu imagen de logo
+                  alt="Logo"
+                  style={{
+                    width: 'auto',
+                    height: '50px',
+                    marginRight: '16px',
+                  }}
+                /> */}
             </Typography>
+            {/* </Tooltip> */}
 
             {/* Menú de perfil */}
-            <Tooltip title="Brandon Baushel Hernandez Granados">
+            {/* <Tooltip title="Brandon Baushel Hernandez Granados">
               <IconButton color="inherit" onClick={handleMenuOpen}>
                 <Avatar
                   alt="Profile"
@@ -143,7 +187,7 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
                   sx={{ width: 50, height: 50 }} // Ancho y alto personalizados
                 />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
           </Toolbar>
         </AppBar>
         {children}
