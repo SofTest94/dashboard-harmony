@@ -302,7 +302,7 @@ const ServiceList = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
           {/* Input para cargar imágenes */}
-          <Tooltip title="Buscar foto imagen representativa">
+          <Tooltip title="Buscar imagen representativa">
             <Box mb={2} textAlign="center">
               <input
                 id="fileInput"
