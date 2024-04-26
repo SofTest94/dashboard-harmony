@@ -78,34 +78,48 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
           <ListItem
             button
             component={RouterLink}
-            to="/home"
+            to="/"
             selected={selectedIndex === 0}
             onClick={() => handleMenuItemClick(0)}
           >
             <HomeIcon sx={{ mr: 1 }} color={selectedIndex === 0 ? 'primary' : 'inherit'} />
-            <ListItemText primary="Inicio" />
+            <ListItemText primary="Empleados" />
           </ListItem>
           <Divider />
+
           <ListItem
             button
             component={RouterLink}
-            to="/user"
+            to="/reviews"
             selected={selectedIndex === 1}
             onClick={() => handleMenuItemClick(1)}
           >
             <GroupIcon sx={{ mr: 1 }} color={selectedIndex === 1 ? 'primary' : 'inherit'} />
-            <ListItemText primary="Usuarios" />
+            <ListItemText primary="Reseñas" />
           </ListItem>
           <Divider />
+
           <ListItem
             button
             component={RouterLink}
-            to="/appointments"
+            to="/treatments"
             selected={selectedIndex === 2}
             onClick={() => handleMenuItemClick(2)}
           >
             <EventIcon sx={{ mr: 1 }} color={selectedIndex === 2 ? 'primary' : 'inherit'} />
-            <ListItemText primary="Citas" />
+            <ListItemText primary="Tratamientos" />
+          </ListItem>
+          <Divider />
+
+          <ListItem
+            button
+            component={RouterLink}
+            to="/services"
+            selected={selectedIndex === 2}
+            onClick={() => handleMenuItemClick(2)}
+          >
+            <EventIcon sx={{ mr: 1 }} color={selectedIndex === 2 ? 'primary' : 'inherit'} />
+            <ListItemText primary="Servicios" />
           </ListItem>
           <Divider />
         </List>

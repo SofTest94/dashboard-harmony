@@ -36,19 +36,16 @@ import AdminTemplate from './components/templates/AdminTemplate';
 import AppointmentPage from './components/pages/Appointments/AppointmentPage';
 
 import UserList from './components/pages/Users/UserListPage';
+import ReviewList from './components/pages/Reviews/ReviewListPage';
 // import AppTemplate from './components/templates/AppTemplate'; // Importa la plantilla principal
 
 const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Ruta para el login */}
-        <Route path="/" element={<LoginPage />} />
-        {/* Ruta para el contenido principal */}
         <Route
-          path="/user"
+          path="/"
           element={
-            // Utiliza la plantilla principal para el contenido principal
             <AdminTemplate>
               <div style={{ margin: '0% 5% 10% 5%' }}>
                 <UserList />
@@ -56,29 +53,18 @@ const App: React.FC = () => {
             </AdminTemplate>
           }
         />
+
         <Route
-          path="/home"
+          path="/reviews"
           element={
-            // Utiliza la plantilla principal para el contenido principal
             <AdminTemplate>
               <div style={{ margin: '0% 5% 10% 5%' }}>
-                <HomePage />
+                <ReviewList />
               </div>
             </AdminTemplate>
           }
         />
 
-        <Route
-          path="/appointments"
-          element={
-            // Utiliza la plantilla principal para el contenido principal
-            <AdminTemplate>
-              <div style={{ margin: '0% 5% 10% 5%' }}>
-                <AppointmentPage />
-              </div>
-            </AdminTemplate>
-          }
-        />
         {/* Otras rutas */}
       </Routes>
     </Router>
