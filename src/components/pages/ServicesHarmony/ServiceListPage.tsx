@@ -182,7 +182,7 @@ const ServiceList = () => {
   const clearInputFields = () => {
     setTitle('');
     setDescription('');
-    setImg('https://bucket-harmony.s3.amazonaws.com/defualt2.png');
+    setImg('https://bucket-harmony.s3.amazonaws.com/servicios.jpeg');
     setSelectedReview(null);
   };
 
@@ -231,7 +231,7 @@ const ServiceList = () => {
       <Typography variant="h3" align="justify">
         LISTADO DE SERVICIO
       </Typography>
-      <Tooltip title="Buscar por título">
+      <Tooltip title="Buscar por nombre">
         <TextField
           label="Buscar"
           variant="outlined"
@@ -247,9 +247,9 @@ const ServiceList = () => {
         <Table>
           <TableHead style={{ backgroundColor: '#f0f0f0' }}>
             <TableRow>
-              <TableCell style={{ fontWeight: 700 }}>NOMBRE COMPLETO</TableCell>
-              <TableCell style={{ fontWeight: 700 }}>COMENTARIOS</TableCell>
-              <TableCell style={{ fontWeight: 700 }}>FOTO DEL PACIENTE</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>NOMBRE</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>DESCRIPCIÓN</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>IMAGEN</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -285,7 +285,7 @@ const ServiceList = () => {
         <DialogContent>
           <TextField
             margin="normal"
-            label="Nombre completo"
+            label="Nombre"
             variant="outlined"
             fullWidth
             value={title}
@@ -293,7 +293,7 @@ const ServiceList = () => {
           />
           <TextField
             margin="normal"
-            label="Comentarios"
+            label="Descripción"
             variant="outlined"
             fullWidth
             multiline
@@ -325,14 +325,14 @@ const ServiceList = () => {
               <label htmlFor="fileInput">
                 <img
                   //
-                  src={img || 'https://bucket-harmony.s3.amazonaws.com/defualt2.png'}
+                  src={img || 'https://bucket-harmony.s3.amazonaws.com/servicios.jpeg'}
                   alt="Preview"
                   style={{
-                    width: '33%',
-                    height: '130px',
+                    width: '100%',
+                    height: '200px',
                     cursor: 'pointer',
                     objectFit: 'fill',
-                    borderRadius: '50%',
+                    // borderRadius: '50%',
                   }}
                 />
               </label>

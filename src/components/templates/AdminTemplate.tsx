@@ -18,6 +18,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Link as RouterLink } from 'react-router-dom';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import HomeIcon from '@mui/icons-material/Home';
+import PersonIcon from '@mui/icons-material/Person';
+import ReviewsIcon from '@mui/icons-material/Reviews';
+import HandshakeIcon from '@mui/icons-material/Handshake';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
+
 import GroupIcon from '@mui/icons-material/Group';
 import EventIcon from '@mui/icons-material/Event';
 import Avatar from '@mui/material/Avatar';
@@ -82,7 +88,7 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
             selected={selectedIndex === 0}
             onClick={() => handleMenuItemClick(0)}
           >
-            <HomeIcon sx={{ mr: 1 }} color={selectedIndex === 0 ? 'primary' : 'inherit'} />
+            <PersonIcon sx={{ mr: 1 }} color={selectedIndex === 0 ? 'primary' : 'inherit'} />
             <ListItemText primary="Empleados" />
           </ListItem>
           <Divider />
@@ -94,7 +100,7 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
             selected={selectedIndex === 1}
             onClick={() => handleMenuItemClick(1)}
           >
-            <GroupIcon sx={{ mr: 1 }} color={selectedIndex === 1 ? 'primary' : 'inherit'} />
+            <ReviewsIcon sx={{ mr: 1 }} color={selectedIndex === 1 ? 'primary' : 'inherit'} />
             <ListItemText primary="Reseñas" />
           </ListItem>
           <Divider />
@@ -103,10 +109,10 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
             button
             component={RouterLink}
             to="/partners"
-            selected={selectedIndex === 1}
-            onClick={() => handleMenuItemClick(1)}
+            selected={selectedIndex === 2}
+            onClick={() => handleMenuItemClick(2)}
           >
-            <GroupIcon sx={{ mr: 1 }} color={selectedIndex === 1 ? 'primary' : 'inherit'} />
+            <HandshakeIcon sx={{ mr: 1 }} color={selectedIndex === 2 ? 'primary' : 'inherit'} />
             <ListItemText primary="Socios" />
           </ListItem>
           <Divider />
@@ -115,10 +121,10 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
             button
             component={RouterLink}
             to="/treatments"
-            selected={selectedIndex === 2}
-            onClick={() => handleMenuItemClick(2)}
+            selected={selectedIndex === 3}
+            onClick={() => handleMenuItemClick(3)}
           >
-            <EventIcon sx={{ mr: 1 }} color={selectedIndex === 2 ? 'primary' : 'inherit'} />
+            <ManageAccountsIcon sx={{ mr: 1 }} color={selectedIndex === 3 ? 'primary' : 'inherit'} />
             <ListItemText primary="Tratamientos" />
           </ListItem>
           <Divider />
@@ -127,10 +133,10 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
             button
             component={RouterLink}
             to="/services"
-            selected={selectedIndex === 2}
-            onClick={() => handleMenuItemClick(2)}
+            selected={selectedIndex === 4}
+            onClick={() => handleMenuItemClick(4)}
           >
-            <EventIcon sx={{ mr: 1 }} color={selectedIndex === 2 ? 'primary' : 'inherit'} />
+            <SelfImprovementIcon sx={{ mr: 1 }} color={selectedIndex === 4 ? 'primary' : 'inherit'} />
             <ListItemText primary="Servicios" />
           </ListItem>
           <Divider />

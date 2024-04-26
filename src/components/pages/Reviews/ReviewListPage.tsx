@@ -231,7 +231,7 @@ const ReviewList = () => {
       <Typography variant="h3" align="justify">
         LISTADO DE RESEÑAS
       </Typography>
-      <Tooltip title="Buscar por título">
+      <Tooltip title="Buscar por nombre">
         <TextField
           label="Buscar"
           variant="outlined"

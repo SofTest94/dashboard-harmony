@@ -230,9 +230,9 @@ const TreatmentList = () => {
         </Stack>
       )}
       <Typography variant="h3" align="justify">
-        Tipos de tratamientos
+        TIPOS DE TRATAMIENTOS
       </Typography>
-      <Tooltip title="Buscar por título">
+      <Tooltip title="Buscar por nombre">
         <TextField
           label="Buscar"
           variant="outlined"

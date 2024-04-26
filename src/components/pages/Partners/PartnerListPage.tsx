@@ -232,7 +232,7 @@ const PartnerList = () => {
       <Typography variant="h3" align="justify">
         LISTADO DE SOCIOS
       </Typography>
-      <Tooltip title="Buscar por título">
+      <Tooltip title="Buscar por nombre">
         <TextField
           label="Buscar"
           variant="outlined"
@@ -248,7 +248,7 @@ const PartnerList = () => {
         <Table>
           <TableHead style={{ backgroundColor: '#f0f0f0' }}>
             <TableRow>
-              <TableCell style={{ fontWeight: 700 }}>SOCIO</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>NOMBRE</TableCell>
               <TableCell style={{ fontWeight: 700 }}>DESCRIPCIÓN</TableCell>
               <TableCell style={{ fontWeight: 700 }}>LOGOTIPO</TableCell>
             </TableRow>
