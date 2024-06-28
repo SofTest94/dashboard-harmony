@@ -3,6 +3,7 @@ export interface Services {
   img: string;
   title: string;
   description: string;
+  idBranch: string;
 }
 
 export interface UpdateServices {
@@ -10,12 +11,14 @@ export interface UpdateServices {
   img: string;
   title: string;
   description: string;
+  idBranch: string;
 }
 
 export interface CreateServices {
   img: string;
   title: string;
   description: string;
+  idBranch: string;
 }
 
 export interface ResponseCreateService {

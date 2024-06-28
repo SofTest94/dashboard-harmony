@@ -23,13 +23,23 @@ import {
   Box,
   Backdrop,
   CircularProgress,
+  FormControl,
+  Select,
+  MenuItem,
+  FormHelperText,
 } from '@mui/material';
 
 import { serviceServices } from '../../../services/serviceHarmony/service';
 import { CreateServices, Services, UpdateServices } from '../../types/serviceHarmony';
 import { awsServices } from '../../../services/aws/aws'; // Importar awsServices
+import { Branches } from '../../types/branches';
+import { branchesServices } from '../../../services/branches/branches';
 
 const ServiceList = () => {
+  const [selectedBranch, setSelectedBranch] = useState<string>('');
+  const [initialBranches, setInitialBranches] = useState<Branches[]>([]);
+  const [branch, setBranch] = useState<string>('');
+  
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [successOpen, setSuccessOpen] = useState<boolean>(false);
@@ -67,7 +77,17 @@ const ServiceList = () => {
       }
     };
 
+    const fetchBranches = async () => {
+      try {
+        const response = await branchesServices.getAllBranches('');
+        setInitialBranches(response);
+      } catch (error) {
+        console.error('Error fetching specialties:', error);
+      }
+    };
+
     fetchReviews();
+    fetchBranches();
   }, []);
 
   const openModal = (reviewId: string, review: Services | null = null) => {
@@ -78,6 +98,7 @@ const ServiceList = () => {
       setTitle(selectedReviewData.title);
       setDescription(selectedReviewData.description);
       setImg(selectedReviewData.img);
+      setSelectedBranch(selectedReviewData.idBranch)
     } else {
       clearInputFields();
     }
@@ -89,6 +110,7 @@ const ServiceList = () => {
       img,
       title,
       description,
+      idBranch: selectedBranch
     };
 
     try {
@@ -123,6 +145,7 @@ const ServiceList = () => {
         img,
         title,
         description,
+        idBranch: selectedBranch
       };
 
       try {
@@ -184,6 +207,7 @@ const ServiceList = () => {
     setDescription('');
     setImg('https://bucket-harmony.s3.amazonaws.com/servicios.jpeg');
     setSelectedReview(null);
+    setSelectedBranch('');
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -301,6 +325,31 @@ const ServiceList = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+          <br/>
+          <br/>
+          <Box>
+          <FormControl fullWidth>
+                  <Select
+                    value={selectedBranch}
+                    onChange={(e) => {
+                      const selectedBranchId = e.target.value as string;
+                      const selectedBranchName =
+                      initialBranches.find((branch) => branch._id === selectedBranch)?._id || '';
+                      setSelectedBranch(selectedBranchId);
+                      setBranch(selectedBranchName); // Establecer el nombre de la especialidad en el estado specialty
+                    }}
+                  >
+                    {initialBranches.map((specialty) => (
+                      <MenuItem key={specialty._id} value={specialty._id}>
+                        {specialty.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <FormHelperText>Seleccione una sucursal</FormHelperText>
+                </FormControl>
+              </Box>
+              <br/>
+          <br/>
           {/* Input para cargar imágenes */}
           <Tooltip title="Buscar imagen representativa">
             <Box mb={2} textAlign="center">
