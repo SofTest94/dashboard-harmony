@@ -15,8 +15,4 @@ async function getAllSpecialties(token: string): Promise<Specialties[]> {
 
 export const specialtiesServices = {
   getAllSpecialties,
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> stage
