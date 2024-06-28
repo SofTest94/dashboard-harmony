@@ -33,7 +33,8 @@ import { serviceServices } from '../../../services/serviceHarmony/service';
 import { CreateServices, Services, UpdateServices } from '../../types/serviceHarmony';
 import { awsServices } from '../../../services/aws/aws'; // Importar awsServices
 import { Branches } from '../../types/branches';
-import { branchesServices } from '../../../services/branches/branches';
+import { branchServices } from '../../../services/branches/branches';
+// import { branchesServices } from '../../../services/branches/branches';
 
 const ServiceList = () => {
   const [selectedBranch, setSelectedBranch] = useState<string>('');
@@ -79,7 +80,7 @@ const ServiceList = () => {
 
     const fetchBranches = async () => {
       try {
-        const response = await branchesServices.getAllBranches('');
+        const response = await branchServices.getAllBranches('');
         setInitialBranches(response);
       } catch (error) {
         console.error('Error fetching specialties:', error);

@@ -33,8 +33,9 @@ import { specialtiesServices } from '../../../services/specialties/specialty';
 import { CreateUsers, UpdateUsers, Users } from '../../types/users';
 import { Specialties } from '../../types/specialties';
 import { awsServices } from '../../../services/aws/aws';
-import { branchesServices } from '../../../services/branches/branches';
+// import { branchesServices } from '../../../services/branches/branches';
 import { Branches } from '../../types/branches';
+import { branchServices } from '../../../services/branches/branches';
 
 const UserList = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -101,7 +102,7 @@ const UserList = () => {
     // branches
     const fetchBranches = async () => {
       try {
-        const response = await branchesServices.getAllBranches('');
+        const response = await branchServices.getAllBranches('');
         setInitialBranches(response);
       } catch (error) {
         console.error('Error fetching specialties:', error);

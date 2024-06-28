@@ -33,7 +33,8 @@ import { treatmentsServices } from '../../../services/treatments/treatments';
 import { CreateTreatments, Treatments, UpdateTreatments } from '../../types/treatments';
 import { awsServices } from '../../../services/aws/aws'; // Importar awsServices
 import { Branches } from '../../types/branches';
-import { branchesServices } from '../../../services/branches/branches';
+import { branchServices } from '../../../services/branches/branches';
+// import { branchesServices } from '../../../services/branches/branches';
 // import { reviewServices } from '../../../services/reviews/reviews';
 
 const TreatmentList = () => {
@@ -82,7 +83,7 @@ const TreatmentList = () => {
     // branches
     const fetchBranches = async () => {
       try {
-        const response = await branchesServices.getAllBranches('');
+        const response = await branchServices.getAllBranches('');
         setInitialBranches(response);
       } catch (error) {
         console.error('Error fetching specialties:', error);

@@ -26,6 +26,8 @@ import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
+import HouseOutlinedIcon from '@mui/icons-material/HouseOutlined';
+
 import GroupIcon from '@mui/icons-material/Group';
 import EventIcon from '@mui/icons-material/Event';
 import Avatar from '@mui/material/Avatar';
@@ -149,7 +151,7 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
             selected={selectedIndex === 5}
             onClick={() => handleMenuItemClick(5)}
           >
-            <SlowMotionVideoIcon sx={{ mr: 1 }} color={selectedIndex === 3 ? 'primary' : 'inherit'} />
+            <SlowMotionVideoIcon sx={{ mr: 1 }} color={selectedIndex === 5 ? 'primary' : 'inherit'} />
             <ListItemText primary="Videos" />
           </ListItem>
           <Divider />
@@ -160,8 +162,19 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
             selected={selectedIndex === 6}
             onClick={() => handleMenuItemClick(6)}
           >
-            <HelpOutlineIcon sx={{ mr: 1 }} color={selectedIndex === 3 ? 'primary' : 'inherit'} />
+            <HelpOutlineIcon sx={{ mr: 1 }} color={selectedIndex === 6 ? 'primary' : 'inherit'} />
             <ListItemText primary="Responder Dudas" />
+          </ListItem>
+          <Divider />
+          <ListItem
+            button
+            component={RouterLink}
+            to="/branches"
+            selected={selectedIndex === 7}
+            onClick={() => handleMenuItemClick(7)}
+          >
+            <HouseOutlinedIcon sx={{ mr: 1 }} color={selectedIndex === 7 ? 'primary' : 'inherit'} />
+            <ListItemText primary="Sucursales" />
           </ListItem>
           <Divider />
         </List>

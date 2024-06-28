@@ -42,6 +42,7 @@ import TreatmentList from './components/pages/Treatments/TreatmentsListPage';
 import ServiceList from './components/pages/ServicesHarmony/ServiceListPage';
 import VideoList from './components/pages/Videos/VideosListPage';
 import QuestionList from './components/pages/Questions/QuestionListPage';
+import BranchList from './components/pages/Branches/BranchesListPage';
 // import AppTemplate from './components/templates/AppTemplate'; // Importa la plantilla principal
 
 const App: React.FC = () => {
@@ -98,8 +99,7 @@ const App: React.FC = () => {
             </AdminTemplate>
           }
         />
-
-<Route
+        <Route
           path="/videos"
           element={
             <AdminTemplate>
@@ -109,13 +109,22 @@ const App: React.FC = () => {
             </AdminTemplate>
           }
         />
-
-<Route
+        <Route
           path="/questions"
           element={
             <AdminTemplate>
               <div style={{ margin: '0% 5% 10% 5%' }}>
                 <QuestionList />
+              </div>
+            </AdminTemplate>
+          }
+        />
+        <Route
+          path="/branches"
+          element={
+            <AdminTemplate>
+              <div style={{ margin: '0% 5% 10% 5%' }}>
+                <BranchList />
               </div>
             </AdminTemplate>
           }
