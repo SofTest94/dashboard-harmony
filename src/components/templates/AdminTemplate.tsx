@@ -23,6 +23,8 @@ import ReviewsIcon from '@mui/icons-material/Reviews';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
+import SlowMotionVideoIcon from '@mui/icons-material/SlowMotionVideo';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 import GroupIcon from '@mui/icons-material/Group';
 import EventIcon from '@mui/icons-material/Event';
@@ -138,6 +140,28 @@ const AdminTemplate: React.FC<AppTemplateProps> = ({ children }) => {
           >
             <SelfImprovementIcon sx={{ mr: 1 }} color={selectedIndex === 4 ? 'primary' : 'inherit'} />
             <ListItemText primary="Servicios" />
+          </ListItem>
+          <Divider />
+          <ListItem
+            button
+            component={RouterLink}
+            to="/videos"
+            selected={selectedIndex === 5}
+            onClick={() => handleMenuItemClick(5)}
+          >
+            <SlowMotionVideoIcon sx={{ mr: 1 }} color={selectedIndex === 3 ? 'primary' : 'inherit'} />
+            <ListItemText primary="Videos" />
+          </ListItem>
+          <Divider />
+          <ListItem
+            button
+            component={RouterLink}
+            to="/questions"
+            selected={selectedIndex === 6}
+            onClick={() => handleMenuItemClick(6)}
+          >
+            <HelpOutlineIcon sx={{ mr: 1 }} color={selectedIndex === 3 ? 'primary' : 'inherit'} />
+            <ListItemText primary="Responder Dudas" />
           </ListItem>
           <Divider />
         </List>

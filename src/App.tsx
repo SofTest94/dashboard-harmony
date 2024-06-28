@@ -40,6 +40,7 @@ import ReviewList from './components/pages/Reviews/ReviewListPage';
 import PartnerList from './components/pages/Partners/PartnerListPage';
 import TreatmentList from './components/pages/Treatments/TreatmentsListPage';
 import ServiceList from './components/pages/ServicesHarmony/ServiceListPage';
+import VideoList from './components/pages/Videos/VideosListPage';
 // import AppTemplate from './components/templates/AppTemplate'; // Importa la plantilla principal
 
 const App: React.FC = () => {
@@ -88,6 +89,28 @@ const App: React.FC = () => {
         />
         <Route
           path="/services"
+          element={
+            <AdminTemplate>
+              <div style={{ margin: '0% 5% 10% 5%' }}>
+                <ServiceList />
+              </div>
+            </AdminTemplate>
+          }
+        />
+
+<Route
+          path="/videos"
+          element={
+            <AdminTemplate>
+              <div style={{ margin: '0% 5% 10% 5%' }}>
+                <VideoList />
+              </div>
+            </AdminTemplate>
+          }
+        />
+
+<Route
+          path="/questions"
           element={
             <AdminTemplate>
               <div style={{ margin: '0% 5% 10% 5%' }}>
