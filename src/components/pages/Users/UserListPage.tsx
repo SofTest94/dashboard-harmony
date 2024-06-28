@@ -36,6 +36,8 @@ import { awsServices } from '../../../services/aws/aws';
 // import { branchesServices } from '../../../services/branches/branches';
 import { Branches } from '../../types/branches';
 import { branchServices } from '../../../services/branches/branches';
+import { rolServices } from '../../../services/roles/roles';
+import { Roles } from '../../types/roles';
 
 const UserList = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -46,6 +48,7 @@ const UserList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('');
   const [selectedBranch, setSelectedBranch] = useState<string>('');
+  const [selectedRolAux, setSelectedRolAux] = useState<string>('');
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState<Users | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
@@ -65,6 +68,7 @@ const UserList = () => {
   const [v, setV] = useState<number>(0);  
   const [specialty, setSpecialty] = useState<string>('');
   const [branch, setBranch] = useState<string>('');
+  const [rolAux, setRolAux] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
 
@@ -109,12 +113,23 @@ const UserList = () => {
       }
     };
 
+    const fetchRolesAux = async () => {
+      try {
+        const response = await rolServices.getAllRoles('');
+        setInitialRolesAux(response);
+      } catch (error) {
+        console.error('Error fetching specialties:', error);
+      }
+    };
+
     fetchSpecialties();
     fetchBranches();
+    fetchRolesAux();
   }, []);
 
   const [initialSpecialties, setInitialSpecialties] = useState<Specialties[]>([]);
   const [initialBranches, setInitialBranches] = useState<Branches[]>([]);
+  const [initialRolesAux, setInitialRolesAux] = useState<Roles[]>([]);
 
   const openModal = (userId: string, user: Users | null = null) => {
     const selectedUserData = users.find((u) => u._id === userId);
@@ -134,8 +149,10 @@ const UserList = () => {
       setPhoto(selectedUserData.photo);
       setSelectedSpecialty(selectedUserData.idSpecialty); // Establecer el valor por defecto del Select
       setSelectedBranch(selectedUserData.idBranch)
+      setSelectedRolAux(selectedUserData.idRol)
       setSpecialty(selectedUserData.specialty);
       setBranch(selectedUserData.idBranch);
+      setRolAux(selectedUserData.idRol);
       
     } else {
       clearInputFields();
@@ -152,7 +169,8 @@ const UserList = () => {
       idSpecialty: selectedSpecialty,
       photo: '', // Omitimos la foto aquí ya que la enviaremos por separado
       specialty,
-      idBranch: selectedBranch
+      idBranch: selectedBranch,
+      idRol: selectedRolAux
     };
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     if (fileInput && fileInput.files && fileInput.files[0]) {
@@ -168,7 +186,7 @@ const UserList = () => {
         console.error('Error al agregar usuario:', error);
       }
     } else {
-      newUser.photo = 'https://bucket-harmony.s3.amazonaws.com/defualt2.png';
+      newUser.photo = 'https://harmony-web.s3.amazonaws.com/logo.jpg';
     }
     // Crear el usuario con la foto y los demás datos
     await userServices.createUser(newUser, '');
@@ -205,18 +223,20 @@ const UserList = () => {
     }
 
     if (selectedUser) {
+      console.log({auxPhoto})
       const updateUser: UpdateUsers = {
         _id: selectedUser._id,
         gender,
         birthday,
-        idRol,
+        
         firstName,
         lastName,
         middleName,
         fullName: `${firstName} ${lastName} ${middleName}`,
         idSpecialty: selectedSpecialty,
         photo: auxPhoto,
-        idBranch: selectedBranch
+        idBranch: selectedBranch,
+        idRol: selectedRolAux,
       };
 
       // jms
@@ -234,7 +254,7 @@ const UserList = () => {
               fullName: `${firstName} ${lastName} ${middleName}`,
               idSpecialty: selectedSpecialty,
               idBranch: selectedBranch,
-              idRol,
+              idRol: selectedRolAux,
               photo,
               createdAt,
               updatedAt,
@@ -301,9 +321,11 @@ const UserList = () => {
     setV(0);
     setSpecialty('');
     setBranch('');
+    setRolAux('');
     setSelectedUser(null);
     setSelectedSpecialty('');
     setSelectedBranch('');
+    setSelectedRolAux('');
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -495,18 +517,40 @@ const UserList = () => {
                   />
                   <label htmlFor="fileInput">
                     <img
-                      src={photo || 'https://bucket-harmony.s3.amazonaws.com/defualt2.png'}
+                      src={photo || 'https://harmony-web.s3.amazonaws.com/logo.jpg'}
                       alt="Preview"
                       style={{
-                        width: '100%',
-                        height: '270px',
+                        width: '80%',
+                        height: '203px',
                         cursor: 'pointer',
                         objectFit: 'fill',
+                        borderRadius:'1vw'
                       }}
                     />
                   </label>
                 </Box>
               </Tooltip>
+              <Box>
+                <FormControl fullWidth>
+                  <Select
+                    value={selectedRolAux}
+                    onChange={(e) => {
+                      const selectedBranchId = e.target.value as string;
+                      const selectedBranchName =
+                      initialRolesAux.find((branch) => branch._id === selectedBranch)?._id || '';
+                      setSelectedRolAux(selectedBranchId);
+                      setRolAux(selectedBranchName); // Establecer el nombre de la especialidad en el estado specialty
+                    }}
+                  >
+                    {initialRolesAux.map((rol) => (
+                      <MenuItem key={rol._id} value={rol._id}>
+                        {rol.type}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <FormHelperText>Seleccione un rol</FormHelperText>
+                </FormControl>
+              </Box>
             </Box>
           </Box>
 

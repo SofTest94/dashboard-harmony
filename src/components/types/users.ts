@@ -11,6 +11,7 @@ export interface Users {
   idRol: string;
   photo: string;
   specialty: string;
+
 }
 export interface CreateUsers {
   firstName: string;
@@ -21,6 +22,7 @@ export interface CreateUsers {
   photo: string;
   specialty: string;
   idBranch: string;
+  idRol: string;
 }
 
 export interface UpdateUsers {
