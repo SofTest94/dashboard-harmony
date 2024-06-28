@@ -256,12 +256,12 @@ const BranchList = () => {
         <Table>
           <TableHead style={{ backgroundColor: '#f0f0f0' }}>
             <TableRow>
-              <TableCell style={{ fontWeight: 700 }}>NOMBRE DE LA SUCURSAL</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>NOMBRE</TableCell>
               <TableCell style={{ fontWeight: 700 }}># INTERIOR</TableCell>
               <TableCell style={{ fontWeight: 700 }}>CIUDAD</TableCell>
-              <TableCell style={{ fontWeight: 700 }}>Municipio/Localidad</TableCell>
-              <TableCell style={{ fontWeight: 700 }}>Estado</TableCell>
-              <TableCell style={{ fontWeight: 700 }}>Celular</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>MUNICIPIO</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>ESTADO</TableCell>
+              <TableCell style={{ fontWeight: 700 }}>CELULAR</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
