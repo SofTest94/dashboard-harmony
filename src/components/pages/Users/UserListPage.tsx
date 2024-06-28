@@ -33,6 +33,8 @@ import { specialtiesServices } from '../../../services/specialties/specialty';
 import { CreateUsers, UpdateUsers, Users } from '../../types/users';
 import { Specialties } from '../../types/specialties';
 import { awsServices } from '../../../services/aws/aws';
+import { branchesServices } from '../../../services/branches/branches';
+import { Branches } from '../../types/branches';
 
 const UserList = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -42,6 +44,7 @@ const UserList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('');
+  const [selectedBranch, setSelectedBranch] = useState<string>('');
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState<Users | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
@@ -58,15 +61,16 @@ const UserList = () => {
   const [updatePhoto, setUpdatePhoto] = useState<string>('');
   const [createdAt, setCreatedAt] = useState<string>('');
   const [updatedAt, setUpdatedAt] = useState<string>('');
-  const [v, setV] = useState<number>(0);
+  const [v, setV] = useState<number>(0);  
   const [specialty, setSpecialty] = useState<string>('');
+  const [branch, setBranch] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
 
   const closeSuccessMessage = () => {
     setTimeout(() => {
       setSuccessMessage('');
-    }, 5000); // 10000 milisegundos = 10 segundos
+    }, 10000); // 10000 milisegundos = 10 segundos
   };
 
   useEffect(() => {
@@ -94,11 +98,22 @@ const UserList = () => {
         console.error('Error fetching specialties:', error);
       }
     };
+    // branches
+    const fetchBranches = async () => {
+      try {
+        const response = await branchesServices.getAllBranches('');
+        setInitialBranches(response);
+      } catch (error) {
+        console.error('Error fetching specialties:', error);
+      }
+    };
 
     fetchSpecialties();
+    fetchBranches();
   }, []);
 
   const [initialSpecialties, setInitialSpecialties] = useState<Specialties[]>([]);
+  const [initialBranches, setInitialBranches] = useState<Branches[]>([]);
 
   const openModal = (userId: string, user: Users | null = null) => {
     const selectedUserData = users.find((u) => u._id === userId);
@@ -117,7 +132,10 @@ const UserList = () => {
       setIdRol(selectedUserData.idRol);
       setPhoto(selectedUserData.photo);
       setSelectedSpecialty(selectedUserData.idSpecialty); // Establecer el valor por defecto del Select
+      setSelectedBranch(selectedUserData.idBranch)
       setSpecialty(selectedUserData.specialty);
+      setBranch(selectedUserData.idBranch);
+      
     } else {
       clearInputFields();
     }
@@ -133,6 +151,7 @@ const UserList = () => {
       idSpecialty: selectedSpecialty,
       photo: '', // Omitimos la foto aquí ya que la enviaremos por separado
       specialty,
+      idBranch: selectedBranch
     };
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     if (fileInput && fileInput.files && fileInput.files[0]) {
@@ -166,9 +185,9 @@ const UserList = () => {
     closeModal();
 
     // Mostrar ventana modal de éxito
-    setAction('AGREGADO EXITOSAMENTE!!!');
-    setSuccessOpen(true);
-    setSuccessMessage('Usuario registrado.');
+    setAction('AGREGADO');
+    setSuccessOpen(true); // Mostrar el diálogo de éxito
+    setSuccessMessage(`Usuario agregado correctamente`);
   };
 
   const handleUpdateUser = async () => {
@@ -189,7 +208,6 @@ const UserList = () => {
         _id: selectedUser._id,
         gender,
         birthday,
-        idBranch,
         idRol,
         firstName,
         lastName,
@@ -197,6 +215,7 @@ const UserList = () => {
         fullName: `${firstName} ${lastName} ${middleName}`,
         idSpecialty: selectedSpecialty,
         photo: auxPhoto,
+        idBranch: selectedBranch
       };
 
       // jms
@@ -213,7 +232,7 @@ const UserList = () => {
               birthday,
               fullName: `${firstName} ${lastName} ${middleName}`,
               idSpecialty: selectedSpecialty,
-              idBranch,
+              idBranch: selectedBranch,
               idRol,
               photo,
               createdAt,
@@ -226,9 +245,9 @@ const UserList = () => {
       setUsers(updatedUsers);
       clearInputFields();
       closeModal();
-      setAction('SE ACTUALIZÓ EXITOSAMENTE!!!');
-      setSuccessOpen(true);
-      setSuccessMessage('Usuario actualizado: ' + firstName + ' ' + lastName + ' ' + middleName);
+      setAction('MODIFICADO');
+      setSuccessOpen(true); // Mostrar el diálogo de éxito
+      setSuccessMessage(`Usuario modificado correctamente`);
     }
   };
 
@@ -249,9 +268,9 @@ const UserList = () => {
         closeModal();
 
         // Mostrar ventana modal de éxito
-        setAction('SE ELIMINO EXITOSAMENTE!!!');
-        setSuccessOpen(true);
-        setSuccessMessage('Usuario eliminado: ' + fullName);
+        setAction('ELIMINADO');
+        setSuccessOpen(true); // Mostrar el diálogo de éxito
+        setSuccessMessage(`Usuario eliminado correctamente`);
       } catch (error) {
         console.error('Error al eliminar el usuario:', error);
       }
@@ -280,8 +299,10 @@ const UserList = () => {
     setUpdatedAt('');
     setV(0);
     setSpecialty('');
+    setBranch('');
     setSelectedUser(null);
     setSelectedSpecialty('');
+    setSelectedBranch('');
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -419,6 +440,27 @@ const UserList = () => {
                   <FormHelperText>Seleccione una especialidad</FormHelperText>
                 </FormControl>
               </Box>
+              <Box>
+                <FormControl fullWidth>
+                  <Select
+                    value={selectedBranch}
+                    onChange={(e) => {
+                      const selectedBranchId = e.target.value as string;
+                      const selectedBranchName =
+                      initialBranches.find((branch) => branch._id === selectedBranch)?._id || '';
+                      setSelectedBranch(selectedBranchId);
+                      setBranch(selectedBranchName); // Establecer el nombre de la especialidad en el estado specialty
+                    }}
+                  >
+                    {initialBranches.map((specialty) => (
+                      <MenuItem key={specialty._id} value={specialty._id}>
+                        {specialty.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <FormHelperText>Seleccione una sucursal</FormHelperText>
+                </FormControl>
+              </Box>
             </Box>
 
             {/* Columna 2 */}
@@ -481,7 +523,7 @@ const UserList = () => {
                   }}
                   variant="contained"
                   color="primary"
-                  disabled={!firstName || !lastName || !selectedSpecialty}
+                  disabled={!firstName || !lastName || !selectedSpecialty || !selectedBranch}
                 >
                   Actualizar
                 </Button>
@@ -504,7 +546,7 @@ const UserList = () => {
                 }}
                 variant="contained"
                 color="primary"
-                disabled={!firstName || !lastName || !middleName || !selectedSpecialty}
+                disabled={!firstName || !lastName || !middleName || !selectedSpecialty || !selectedBranch}
               >
                 Agregar
               </Button>

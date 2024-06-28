@@ -20,6 +20,7 @@ export interface CreateUsers {
   idSpecialty: string;
   photo: string;
   specialty: string;
+  idBranch: string;
 }
 
 export interface UpdateUsers {
