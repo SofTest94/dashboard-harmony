@@ -3,6 +3,7 @@ export interface Treatments {
   img: string;
   title: string;
   description: string;
+  idBranch: string;
 }
 
 export interface UpdateTreatments {
@@ -10,10 +11,12 @@ export interface UpdateTreatments {
   img: string;
   title: string;
   description: string;
+  idBranch: string;
 }
 
 export interface CreateTreatments {
   img: string;
   title: string;
   description: string;
+  idBranch: string;
 }

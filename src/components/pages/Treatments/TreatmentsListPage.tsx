@@ -23,14 +23,25 @@ import {
   Box,
   Backdrop,
   CircularProgress,
+  FormControl,
+  Select,
+  MenuItem,
+  FormHelperText,
 } from '@mui/material';
 
 import { treatmentsServices } from '../../../services/treatments/treatments';
 import { CreateTreatments, Treatments, UpdateTreatments } from '../../types/treatments';
 import { awsServices } from '../../../services/aws/aws'; // Importar awsServices
+import { Branches } from '../../types/branches';
+import { branchesServices } from '../../../services/branches/branches';
 // import { reviewServices } from '../../../services/reviews/reviews';
 
 const TreatmentList = () => {
+  const [selectedBranch, setSelectedBranch] = useState<string>('');
+  const [initialBranches, setInitialBranches] = useState<Branches[]>([]);
+  const [branch, setBranch] = useState<string>('');
+  
+  
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [successOpen, setSuccessOpen] = useState<boolean>(false);
@@ -68,7 +79,18 @@ const TreatmentList = () => {
       }
     };
 
+    // branches
+    const fetchBranches = async () => {
+      try {
+        const response = await branchesServices.getAllBranches('');
+        setInitialBranches(response);
+      } catch (error) {
+        console.error('Error fetching specialties:', error);
+      }
+    };
+    
     fetchReviews();
+    fetchBranches();
   }, []);
 
   const openModal = (reviewId: string, review: Treatments | null = null) => {
@@ -79,6 +101,7 @@ const TreatmentList = () => {
       setTitle(selectedReviewData.title);
       setDescription(selectedReviewData.description);
       setImg(selectedReviewData.img);
+      setSelectedBranch(selectedReviewData.idBranch)
     } else {
       clearInputFields();
     }
@@ -90,6 +113,7 @@ const TreatmentList = () => {
       img,
       title,
       description,
+      idBranch: selectedBranch
     };
 
     try {
@@ -124,6 +148,7 @@ const TreatmentList = () => {
         img,
         title,
         description,
+        idBranch: selectedBranch
       };
 
       try {
@@ -185,6 +210,7 @@ const TreatmentList = () => {
     setDescription('');
     setImg('https://bucket-harmony.s3.amazonaws.com/tratamientos.jpeg');
     setSelectedReview(null);
+    setSelectedBranch('');
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -302,6 +328,31 @@ const TreatmentList = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+          <br/>
+          <br/>
+          <Box>
+          <FormControl fullWidth>
+                  <Select
+                    value={selectedBranch}
+                    onChange={(e) => {
+                      const selectedBranchId = e.target.value as string;
+                      const selectedBranchName =
+                      initialBranches.find((branch) => branch._id === selectedBranch)?._id || '';
+                      setSelectedBranch(selectedBranchId);
+                      setBranch(selectedBranchName); // Establecer el nombre de la especialidad en el estado specialty
+                    }}
+                  >
+                    {initialBranches.map((specialty) => (
+                      <MenuItem key={specialty._id} value={specialty._id}>
+                        {specialty.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <FormHelperText>Seleccione una sucursal</FormHelperText>
+                </FormControl>
+              </Box>
+              <br/>
+          <br/>
           {/* Input para cargar imágenes */}
           <Tooltip title="Busca la imagen del tratamiento">
             <Box mb={2} textAlign="center">
@@ -339,6 +390,7 @@ const TreatmentList = () => {
               </label>
             </Box>
           </Tooltip>
+          
           {/* Fin del input para cargar imágenes */}
         </DialogContent>
         <DialogActions>
